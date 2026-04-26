@@ -14,7 +14,7 @@ CREATE TABLE public.PRODUCTO (
   CREADO TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );  
 """
-class Producto(BaseModel):
+class SchemaProducto(BaseModel):
   id: int
   sku: str
   nombre: str
