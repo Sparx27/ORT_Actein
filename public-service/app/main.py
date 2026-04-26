@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.models.mod_producto import Producto
+from app.schemas.sch_producto import Producto
 
 app = FastAPI()
 
