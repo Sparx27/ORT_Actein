@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from app.schemas.sch_producto import schProductoLista
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -10,7 +10,11 @@ from app.models.mod_categoria_producto import CategoriaProducto
 productoRouter = APIRouter()
 
 @productoRouter.get("/productos", response_model=list[schProductoLista])
-def get_productos(db: Session = Depends(get_db)):
+def get_productos(
+    db: Session = Depends(get_db),
+    page: int = Query(default=1, ge=1)):
+    limite = 12
+    offset = (page - 1) * limite
     query = (
         select(
             Producto.id,
@@ -20,5 +24,7 @@ def get_productos(db: Session = Depends(get_db)):
         )
         .join(CategoriaProducto, Producto.categoria_id == CategoriaProducto.id, isouter=True)
         .where(Producto.activo == True)
+        .limit(limite)
+        .offset(offset)
     )
     return db.execute(query).all()
