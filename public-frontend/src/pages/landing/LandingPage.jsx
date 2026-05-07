@@ -1,7 +1,9 @@
 
 const LandingPage = () => {
   return (
-    <div>LandingPage</div>
+    <div style={{ padding: '45px' }}>
+      <h1>LANDING</h1>
+    </div>
   )
 }
 

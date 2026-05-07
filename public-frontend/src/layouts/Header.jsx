@@ -1,9 +1,14 @@
-import { useState } from 'react'
 import '../styles/header.css'
 import logo from '../assets/header_icon.png'
+import DesktopPanel from '../shared_components/DesktopPanel'
+import useToggle from '../hooks/useToggle'
+import MobilePanelBtn from '../shared_components/MobilePanelBtn'
+import MobilePanel from '../shared_components/MobilePanel'
+import { Link, NavLink } from 'react-router-dom'
+
 
 const Header = () => {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const { isActive, toggle } = useToggle()
 
   return (
     <>
@@ -15,13 +20,15 @@ const Header = () => {
             <h1>Refrigeración Industrial</h1>
           </a>
 
-          <nav>
-            <ul className="menu-container">
-              <li><a href="#">Inicio</a></li>
-              <li><a href="#" className="link-active">Catálogo</a></li>
-              <li><a href="#">Solicitar Cotización</a></li>
-            </ul>
-          </nav>
+          <DesktopPanel>
+            <nav>
+              <ul className="menu-container">
+                <li><NavLink to="/">Inicio</NavLink></li>
+                <li><NavLink to="/productos">Catálogo</NavLink></li>
+                <li><NavLink to="/solicitud">Solicitar Cotización</NavLink></li>
+              </ul>
+            </nav>
+          </DesktopPanel>
 
           <div className="header-right">
             {/* CART BUTTON */}
@@ -36,27 +43,25 @@ const Header = () => {
             </button>
 
             {/* HAMBURGER MOVILE */}
-            <button
-              className={`hamburger ${mobileNavOpen ? 'open' : ''}`}
-              onClick={() => setMobileNavOpen(prev => !prev)}
-              aria-label="Menú"
-            >
+            <MobilePanelBtn onPress={toggle} btnClass={'hamburger'}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <line x1="3" y1="12" x2="21" y2="12" />
                 <line x1="3" y1="18" x2="21" y2="18" />
               </svg>
-            </button>
+            </MobilePanelBtn>
           </div>
 
         </div>
       </header>
 
-      <div className={`mobile-nav ${mobileNavOpen ? 'open' : ''}`}>
-        <a href="#">Inicio</a>
-        <a href="#" className="active">Catálogo</a>
-        <a href="#">Solicitar Cotización</a>
-      </div>
+      <MobilePanel isActive={isActive} panelClass={'mobile-nav'}>
+        <nav>
+          <Link to="/">Inicio</Link>
+          <Link to="/">Catálogo</Link>
+          <Link to="/">Solicitar Cotización</Link>
+        </nav>
+      </MobilePanel>
     </>
   )
 }

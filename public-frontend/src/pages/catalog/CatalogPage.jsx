@@ -1,8 +1,11 @@
 
 
+
 const CatalogPage = () => {
   return (
-    <div>CatalogPage</div>
+    <div>
+
+    </div>
   )
 }
 
