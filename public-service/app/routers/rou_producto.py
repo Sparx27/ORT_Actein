@@ -13,7 +13,7 @@ productoRouter = APIRouter()
 def get_productos(
     db: Session = Depends(get_db),
     page: int = Query(default=1, ge=1)):
-    limite = 9
+    limite = 12
     offset = (page - 1) * limite
     query = (
         select(
