@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from app.routers.rou_categoria_producto import catrouter
-from app.routers.rou_producto import productoRouter
+from app.routers.rou_category_product import category_router
+from app.routers.rou_product import product_router
 
 app = FastAPI()
 
-app.include_router(catrouter)
-app.include_router(productoRouter)
+app.include_router(category_router)
+app.include_router(product_router)
 
 @app.get('/')
 def home():
-  return {'mensaje': 'Servicio encendido'}
+  return {'message': 'Servicio encendido'}
