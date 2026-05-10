@@ -10,10 +10,10 @@ def svc_get_products(db: Session, page: int, search: str | None, category_id: in
     total_products = rep_count_products(db,search)
     total_pages = math.ceil(total_products/LIMIT) if total_products > 0 else 1
     return {
-        'products' : products,
         'total_products' : total_products,
         'page' : page,
-        'total_pages' : total_pages
+        'total_pages' : total_pages,
+        'products' : products
     }
 
 def svc_get_filters(db: Session, search: str | None):

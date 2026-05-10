@@ -10,10 +10,10 @@ class SchProductList(BaseModel):
     brand: str = Field(validation_alias='marca')
 
 class SchProductPaginated(BaseModel):
-    products : list[SchProductList]
     total_products : int
     page : int
     total_pages : int
+    products : list[SchProductList]
 
 class SchFiltersProduct(BaseModel):
     categories: list[SchCategory]
