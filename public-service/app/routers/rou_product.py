@@ -12,9 +12,11 @@ product_router = APIRouter()
 def get_products(
     db: Session = Depends(get_db),
     page: int = Query(default=1, ge=1),
-    search: str | None = Query(default=None)
+    search: str | None = Query(default=None),
+    category_id : int | None = Query(default=None),
+    brand: str | None = Query(default=None)
 ):
-    return svc_get_products(db, page, search)
+    return svc_get_products(db, page, search, category_id, brand)
 
 @product_router.get('/products/filters', response_model=SchFiltersProduct)
 def get_filters(
