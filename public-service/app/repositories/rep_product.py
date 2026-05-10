@@ -1,4 +1,4 @@
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, func
 from sqlalchemy.orm import Session
 from app.models.mod_product import Product
 from app.models.mod_category_product import CategoryProduct
@@ -47,6 +47,30 @@ def rep_get_products(
         query = query.where(*filters)
     query = query.limit(limit).offset(offset)
     return db.execute(query).all()
+
+def rep_count_products(db: Session, search: str | None) -> int:
+    filters_ = _build_search_filter(search)
+    query = (
+        select(func.count())
+        .select_from(Product)
+        .where(Product.activo == True, *filters_)
+    )
+    return db.execute(query).scalar()
+
+def rep_get_product_by_id(db:Session, product_id:int):
+    query = (
+        select(
+            Product.id,
+            Product.nombre,
+            Product.marca,
+            CategoryProduct.nombre.label('category_name'),
+            Product.especificaciones
+        )
+        .join(CategoryProduct, Product.categoria_id == CategoryProduct.id, isouter=True)
+        .where(Product.activo == True, Product.id == product_id)
+    )
+    return db.execute(query).first()
+    
 
 def rep_get_categories_with_products(db: Session, search: str | None):
     filters = _build_search_filter(search)

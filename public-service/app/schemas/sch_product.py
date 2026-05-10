@@ -9,6 +9,21 @@ class SchProductList(BaseModel):
     category_name: str | None = None
     brand: str = Field(validation_alias='marca')
 
+class SchProductPaginated(BaseModel):
+    products : list[SchProductList]
+    total_products : int
+    page : int
+    total_pages : int
+
 class SchFiltersProduct(BaseModel):
     categories: list[SchCategory]
     brands: list[str]
+
+class SchProductDetail(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str = Field(validation_alias='nombre')
+    category_name: str | None = None
+    brand: str = Field(validation_alias='marca')    
+    technical_specifications : str = Field(validation_alias='especificaciones')
