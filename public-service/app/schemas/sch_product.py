@@ -26,4 +26,4 @@ class SchProductDetail(BaseModel):
     name: str = Field(validation_alias='nombre')
     category_name: str | None = None
     brand: str = Field(validation_alias='marca')    
-    technical_specifications : str = Field(validation_alias='especificaciones')
+    technical_specifications : str | None = Field(validation_alias='especificaciones')

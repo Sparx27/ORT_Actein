@@ -12,5 +12,8 @@ def get_db():
   db = SqlSession()
   try:
     yield db
+  except Exception:
+    db.rollback()
+    raise
   finally:
     db.close()

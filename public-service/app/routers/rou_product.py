@@ -2,9 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.config.database import get_db
 from app.schemas.sch_product import SchProductDetail, SchFiltersProduct, SchProductPaginated
-
 from app.services.svc_product import svc_get_products, svc_get_filters, svc_get_product_by_id
-
 
 product_router = APIRouter()
 
@@ -25,9 +23,9 @@ def get_filters(
 ):
     return svc_get_filters(db, search)
 
-@product_router.get('/products/{id}', response_model=SchProductDetail)
+@product_router.get('/products/{product_id}', response_model=SchProductDetail)
 def get_product(
-    id: int,
+    product_id: int,
     db: Session = Depends(get_db)
 ):
-    return svc_get_product_by_id(db, id)
+    return svc_get_product_by_id(db, product_id)

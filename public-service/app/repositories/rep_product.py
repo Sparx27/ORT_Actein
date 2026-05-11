@@ -35,21 +35,31 @@ def rep_get_products(
         brand: str | None
 ):
     query = _base_query()
-    filters = _build_search_filter(search)
+    filters_ = _build_search_filter(search)
 
     if category_id:
-        filters.append(Product.categoria_id == category_id)
+        filters_.append(Product.categoria_id == category_id)
     
     if brand:
-        filters.append(Product.marca == brand)
+        filters_.append(Product.marca.ilike(brand))
 
-    if filters:
-        query = query.where(*filters)
+    if filters_:
+        query = query.where(*filters_)
     query = query.limit(limit).offset(offset)
     return db.execute(query).all()
 
-def rep_count_products(db: Session, search: str | None) -> int:
+def rep_count_products(
+        db: Session, 
+        search: str | None,
+        category_id: int | None,
+        brand: str | None
+) -> int:
     filters_ = _build_search_filter(search)
+    if category_id:
+        filters_.append(Product.categoria_id == category_id)
+    
+    if brand:
+        filters_.append(Product.marca == brand)
     query = (
         select(func.count())
         .select_from(Product)
