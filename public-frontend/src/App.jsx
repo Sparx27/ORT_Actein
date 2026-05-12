@@ -4,6 +4,7 @@ import CatalogPage from './pages/catalog/CatalogPage'
 import LandingPage from './pages/landing/LandingPage'
 import QuotePage from './pages/quote/QuotePage'
 import { useEffect } from 'react'
+import ProductDetailPage from './pages/product_detail/ProductDetailPage'
 
 function App() {
   const navigate = useNavigate()
@@ -17,6 +18,7 @@ function App() {
       <Route element={<MainLayout />}>
         <Route index element={<LandingPage />} />
         <Route path="/productos" element={<CatalogPage />} />
+        <Route path="/productos/:id" element={<ProductDetailPage />} />
         <Route path="/solicitud" element={<QuotePage />} />
       </Route>
     </Routes>

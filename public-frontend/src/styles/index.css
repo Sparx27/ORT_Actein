@@ -3,16 +3,20 @@
   --navy-light: #1a3256;
   --link-inactive: rgba(255, 255, 255, 0.65);
   --teal: #0e7490;
+  --teal-hover: #0c6478;
   --teal-bg: #ecfeff;
   --teal-tag: #cffafe;
   --teal-tag-t: #0e7490;
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;
+  --gray-150: #e8eef4;
   --gray-200: #e2e8f0;
   --gray-300: #cbd5e1;
   --gray-400: #94a3b8;
   --gray-500: #64748b;
+  --gray-600: #475569;
   --gray-700: #334155;
+  --gray-800: #1e293b;
   --gray-900: #0f172a;
   --white: #FFF;
   --default-bg: #eef0f3;
@@ -50,6 +54,28 @@ header {
   font-family: var(--font-head);
 }
 
+figure {
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.figure-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 img,
 picture,
 video,
@@ -77,16 +103,19 @@ h6 {
 }
 
 p {
-  font-size: 15px;
+  font-size: 14px;
 }
 
-h1,
+h1 {
+  font-family: var(--font-head);
+}
+
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-head);
+  font-family: var(--font-main);
 }
 
 ul,
@@ -94,8 +123,70 @@ ol {
   list-style: none;
 }
 
+.h1 {
+  font-family: var(--font-head);
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-900);
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.upper {
+  text-transform: uppercase;
+}
+
+/****************** SHARED COMPONENTS ******************/
+
 .container {
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 var(--adaptable-px);
+}
+
+.page-padding {
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+
+.content-box {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.btn-base {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding-top: 10px;
+  padding-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: background 0.15s;
+}
+
+.btn-primary {
+  background: var(--teal);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background: var(--teal-hover);
 }
