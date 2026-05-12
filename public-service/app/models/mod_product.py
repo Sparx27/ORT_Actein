@@ -2,9 +2,8 @@ from app.config.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, ForeignKey, Boolean, Text, DateTime
 from datetime import datetime
-from typing import Optional
 
-class Producto(Base):
+class Product(Base):
     __tablename__ = 'producto'
     __table_args__ = {'schema':'public'}
 
