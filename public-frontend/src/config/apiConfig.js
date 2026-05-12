@@ -1,0 +1,1 @@
+export const VITE_URL_PUBLIC_SERVICE = import.meta.env.VITE_URL_PUBLIC_SERVICE
