@@ -17,7 +17,7 @@ const ProductCard = ({ product }) => {
           <div className="card-brand">{brand}</div>
           <div className="card-no-price">Precio disponible previa consulta</div>
           <div className="card-actions">
-            <button className="btn-detalle"><Link to="/productos/1">Ver detalle</Link></button>
+            <button className="btn-detalle"><Link to={`/productos/${id}`}>Ver detalle</Link></button>
             <button className="btn-cotizar">
               + Cotizar
             </button>
