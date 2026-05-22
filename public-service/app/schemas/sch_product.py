@@ -9,15 +9,16 @@ class SchProductList(BaseModel):
     category_name: str | None = None
     brand: str = Field(validation_alias='marca')
 
+class SchFiltersProduct(BaseModel):
+    categories: list[SchCategory]
+    brands: list[str]
+
 class SchProductPaginated(BaseModel):
     total_products : int
     page : int
     total_pages : int
     products : list[SchProductList]
-
-class SchFiltersProduct(BaseModel):
-    categories: list[SchCategory]
-    brands: list[str]
+    filters : SchFiltersProduct
 
 class SchProductDetail(BaseModel):
     model_config = ConfigDict(from_attributes=True)
