@@ -1,8 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 class SchCategoryProduct(BaseModel):
   model_config = ConfigDict(from_attributes=True)
 
   id: int
-  name: str = Field(validation_alias='nombre')
-  description: str | None = Field(default=None, validation_alias='dsc')
+  name: str 
+  description: str | None

@@ -1,13 +1,13 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 from app.schemas.sch_category import SchCategory
 
 class SchProductList(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    name: str = Field(validation_alias='nombre')
+    name: str
     category_name: str | None = None
-    brand: str = Field(validation_alias='marca')
+    brand: str
 
 class SchFiltersProduct(BaseModel):
     categories: list[SchCategory]
@@ -24,7 +24,9 @@ class SchProductDetail(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    name: str = Field(validation_alias='nombre')
+    name: str 
+    description: str | None = None
     category_name: str | None = None
-    brand: str = Field(validation_alias='marca')    
-    technical_specifications : str | None = Field(validation_alias='especificaciones')
+    brand: str   
+    specifications : str | None = None
+    requires_installation : bool | None = None
