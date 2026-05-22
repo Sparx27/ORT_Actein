@@ -1,25 +1,17 @@
-import { useEffect, useState } from 'react'
 import ProductCard from './ProductCard'
-import { getProducts } from '../../services/products'
+import useProducts from '../../hooks/useProducts'
 
 const ProductsList = () => {
-  const [loading, setLoading] = useState(true)
-  const [products, setProducts] = useState([])
-  const [errMessage, setErrMessage] = useState('')
+  const { isLoading, isFetching, data, error } = useProducts()
 
-  useEffect(() => {
-    getProducts()
-      .then(data => setProducts(data))
-      .catch(err => setErrMessage(err.message))
-      .finally(() => setLoading(false))
-  }, [])
+  if (isLoading) return <p>Cargando...</p>
+  if (error) return <p style={{ color: 'red' }}>{error.message}</p>
+  if (data.products.length === 0) return <p>No hay productos.</p>
 
   return (
     <div className="product-grid">
-      {loading && <p>Cargando...</p>}
-      {errMessage && <p style={{ color: 'red' }}>{errMessage}</p>}
-      {!loading && !errMessage && products.length === 0 && <p>No hay productos.</p>}
-      {!loading && !errMessage && products.map(p => <ProductCard key={p.id} product={p} />)}
+      {isFetching && <p>Actualizando...</p>}
+      {data.products.map(p => <ProductCard key={p.id} product={p} />)}
     </div>
   )
 }
