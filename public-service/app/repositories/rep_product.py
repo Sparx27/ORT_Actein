@@ -75,6 +75,7 @@ def rep_get_product_by_id(db:Session, product_id:int):
             Product.description,
             Product.brand,
             CategoryProduct.name.label('category_name'),
+            CategoryProduct.id.label('category_id'),
             Product.specifications,
             Product.requires_installation
         )
