@@ -89,7 +89,7 @@ def rep_get_categories_with_products(db: Session, search: str | None):
     query = (
         select(CategoryProduct.id, CategoryProduct.name)
         .join(Product, Product.category_id == CategoryProduct.id)
-        .where(Product.is_active == True, *filters)
+        .where(CategoryProduct.is_active == True, Product.is_active == True, *filters)
         .distinct()
     )
     return db.execute(query).all()
