@@ -6,10 +6,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   return (
     <nav className="pagination">
 
-      {/* Botón Anterior */}
       <button
         className="pagination-nav"
-        onClick={() => onPageChange(p => p - 1)}
+        onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
       >
         <span className="pagination-nav-arrow">‹</span> Anterior
@@ -29,10 +28,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           </button>
       )}
 
-      {/* Botón Siguiente */}
       <button
         className="pagination-nav"
-        onClick={() => onPageChange(p => p + 1)}
+        onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
       >
         Siguiente <span className="pagination-nav-arrow">›</span>
