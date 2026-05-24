@@ -59,7 +59,7 @@ def rep_count_products(
         filters_.append(Product.category_id == category_id)
     
     if brand:
-        filters_.append(Product.brand == brand)
+        filters_.append(Product.brand.ilike(brand))
     query = (
         select(func.count())
         .select_from(Product)
