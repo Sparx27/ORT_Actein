@@ -1,21 +1,12 @@
 import React from 'react'
 import ContentBox from '../../shared_components/ContentBox'
 import SvgSpecs from '../../shared_components/svg/SvgSpecs'
+import { parseSpecs } from '../../utils/productDataUtils'
 
 const PRODUCTO = 'capacidad: 20lt, Rango de temperatura: 10 - 5'
 
-const parsear = (str) => {
-  const key_value = str.split(',')
-  const res = key_value.map(lv => {
-    const [a, b] = lv.split(':')
-    return [a, b]
-  })
-  return res
-}
-
 const ProductSpecs = ({ specifications }) => {
-  // specsArray = parseSpecifications(specifications) de helpers/yoquese.js
-  // usar abajo
+  const specsArray = parseSpecs(specifications)
 
   return (
     <ContentBox design={'product-specs'}>
@@ -27,12 +18,11 @@ const ProductSpecs = ({ specifications }) => {
       <table className="product-specs-table">
         <tbody>
           {
-            parsear(PRODUCTO).map(p => {
-              console.log(p)
+            specsArray.map((s, i) => {
               return (
-                <tr>
-                  <td className="product-specs-key">{p[0]}</td>
-                  <td className="product-specs-val">{p[1]}</td>
+                <tr key={`tr-${i}`}>
+                  <td className="product-specs-key">{s[0]}</td>
+                  <td className="product-specs-val">{s[1]}</td>
                 </tr>
               )
             })
@@ -42,5 +32,7 @@ const ProductSpecs = ({ specifications }) => {
     </ContentBox>
   )
 }
+
+
 
 export default ProductSpecs

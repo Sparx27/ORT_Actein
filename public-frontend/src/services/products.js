@@ -1,7 +1,13 @@
 import { publicService } from '../config/publicServiceConfig'
 
-export const getProducts = async () => {
-  const { data } = await publicService.get('/products')
+export const getProducts = async ({ page }) => {
+
+  const params = {
+    // Bizarreadas hermosas que te solo JS te permite hacer
+    ...(page && { page })
+  }
+
+  const { data } = await publicService.get('/products', { params })
   return data
 }
 
