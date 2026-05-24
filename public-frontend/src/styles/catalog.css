@@ -399,6 +399,85 @@
 
 /****************************** END CATALOG FILTER ******************************/
 
+/****************************** PAGINATION ******************************/
+.product-list {
+  width: 100%;
+}
+
+.product-page-info {
+  margin-left: 8px;
+  margin-bottom: 12px;
+}
+
+.pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-main);
+  font-size: 14px;
+}
+
+.pagination-page {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--gray-700);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.pagination-page:hover {
+  background: var(--gray-100);
+}
+
+.pagination-page--active {
+  border-color: var(--teal);
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.pagination-dots {
+  padding: 0 4px;
+  color: var(--gray-400);
+  user-select: none;
+}
+
+.pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--gray-500);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+
+.pagination-nav:hover:not(:disabled) {
+  background: var(--gray-100);
+  color: var(--gray-700);
+}
+
+.pagination-nav:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pagination-nav-arrow {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/****************************** END PAGINATION ******************************/
+
 
 @media (max-width: 1024px) {
   .product-grid {
@@ -434,6 +513,24 @@
 
   .filter-form-wrap.collapsed {
     display: none;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .pagination-page,
+  .pagination-dots {
+    display: none;
+  }
+
+  .pagination-page--active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gray-700);
   }
 }
 

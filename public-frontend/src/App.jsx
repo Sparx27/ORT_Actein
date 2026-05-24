@@ -1,18 +1,11 @@
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
 import CatalogPage from './pages/catalog/CatalogPage'
 import LandingPage from './pages/landing/LandingPage'
 import QuotePage from './pages/quote/QuotePage'
-import { useEffect } from 'react'
 import ProductDetailPage from './pages/product_detail/ProductDetailPage'
 
 function App() {
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    navigate('/productos')
-  }, [])
-
   return (
     <Routes>
       <Route element={<MainLayout />}>
