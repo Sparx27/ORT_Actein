@@ -27,6 +27,7 @@ class SchProductDetail(BaseModel):
     name: str 
     description: str | None = None
     category_name: str | None = None
+    category_id: int | None = None
     brand: str   
     specifications : str | None = None
     requires_installation : bool | None = None
