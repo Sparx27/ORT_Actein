@@ -3,8 +3,6 @@ import ContentBox from '../../shared_components/ContentBox'
 import SvgSpecs from '../../shared_components/svg/SvgSpecs'
 import { parseSpecs } from '../../utils/productDataUtils'
 
-const PRODUCTO = 'capacidad: 20lt, Rango de temperatura: 10 - 5'
-
 const ProductSpecs = ({ specifications }) => {
   const specsArray = parseSpecs(specifications)
 
@@ -32,7 +30,5 @@ const ProductSpecs = ({ specifications }) => {
     </ContentBox>
   )
 }
-
-
 
 export default ProductSpecs
