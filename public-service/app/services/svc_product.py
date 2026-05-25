@@ -20,6 +20,7 @@ def svc_get_products(db: Session, page: int, search: str | None, category_id: in
         total_pages = math.ceil(total_products/LIMIT) if total_products > 0 else 1
         categories = rep_get_categories_with_products(db, search)
         brands = [row.brand for row in rep_get_brands(db, search)]
+        
         return {
             'total_products' : total_products,
             'page' : page,

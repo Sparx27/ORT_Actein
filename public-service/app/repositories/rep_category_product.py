@@ -6,5 +6,6 @@ def rep_get_categories(db: Session):
   query = (
     select(CategoryProduct)
     .where(CategoryProduct.is_active == True)
+    .order_by(CategoryProduct.name)
   )
   return db.execute(query).scalars().all()
