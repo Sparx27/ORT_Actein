@@ -8,3 +8,24 @@ export const parseSpecs = (str) => {
   })
   return res
 }
+
+const PARAM_MAP = {
+  page: 'pagina',
+  category_id: 'categoria',
+  brand: 'marca',
+  search: 'busqueda',
+  installation: 'instalacion',
+}
+
+export const buildCatalogPath = (params = {}) => {
+  const search = new URLSearchParams()
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === null || value === undefined || value === '') return
+    const urlKey = PARAM_MAP[key] ?? key
+    search.set(urlKey, value)
+  })
+
+  const qs = search.toString()
+  return qs ? `/productos?${qs}` : '/productos'
+}
