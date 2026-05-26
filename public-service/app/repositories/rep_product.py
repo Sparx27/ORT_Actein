@@ -3,18 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.mod_product import Product
 from app.models.mod_category_product import CategoryProduct
 
-
-def _base_query():
-    return (
-        select(
-            Product.id,
-            Product.name,
-            Product.brand,
-            CategoryProduct.name.label('category_name')
-        )
-        .join(CategoryProduct, Product.category_id == CategoryProduct.id, isouter=True)
-        .where(Product.is_active == True)
-    )
+_IS_ACTIVE = Product.is_active == True
 
 def _build_search_filter(search: str | None) -> list:
     if not search:
@@ -27,25 +16,41 @@ def _build_search_filter(search: str | None) -> list:
         )
     ]
 
-def rep_get_products(
-        db: Session, 
-        search: str | None, 
-        limit: int, offset: int, 
-        category_id: int | None, 
-        brand: str | None
-):
-    query = _base_query()
-    filters_ = _build_search_filter(search)
-
+def _build_filters(
+    search: str | None,
+    category_id: int | None,
+    brand: str | None
+)-> list:
+    filters = _build_search_filter(search)
     if category_id:
-        filters_.append(Product.category_id == category_id)
-    
+        filters.append(Product.category_id == category_id)
     if brand:
-        filters_.append(Product.brand.ilike(brand))
+        filters.append(Product.brand.ilike(brand))
 
-    if filters_:
-        query = query.where(*filters_)
-    query = query.limit(limit).offset(offset)
+    return filters
+    
+
+def rep_get_products(
+    db: Session, 
+    search: str | None, 
+    limit: int, offset: int, 
+    category_id: int | None, 
+    brand: str | None
+):
+    filters_ =_build_filters(search, category_id, brand)
+    query = (
+        select(
+            Product.id,
+            Product.name,
+            Product.brand,
+            CategoryProduct.name.label('category_name')
+        )
+        .join(CategoryProduct, Product.category_id == CategoryProduct.id, isouter=True)
+        .where(_IS_ACTIVE == True, *filters_)
+        .order_by(Product.name)
+        .limit(limit)
+        .offset(offset)
+    )
     return db.execute(query).all()
 
 def rep_count_products(
@@ -54,16 +59,12 @@ def rep_count_products(
         category_id: int | None,
         brand: str | None
 ) -> int:
-    filters_ = _build_search_filter(search)
-    if category_id:
-        filters_.append(Product.category_id == category_id)
-    
-    if brand:
-        filters_.append(Product.brand.ilike(brand))
+    filters_ =_build_filters(search, category_id, brand)
+
     query = (
         select(func.count())
         .select_from(Product)
-        .where(Product.is_active == True, *filters_)
+        .where(_IS_ACTIVE == True, *filters_)
     )
     return db.execute(query).scalar()
 
@@ -80,7 +81,7 @@ def rep_get_product_by_id(db:Session, product_id:int):
             Product.requires_installation
         )
         .join(CategoryProduct, Product.category_id == CategoryProduct.id, isouter=True)
-        .where(Product.is_active == True, Product.id == product_id)
+        .where(_IS_ACTIVE, Product.id == product_id)
     )
     return db.execute(query).first()
     
@@ -90,7 +91,8 @@ def rep_get_categories_with_products(db: Session, search: str | None):
     query = (
         select(CategoryProduct.id, CategoryProduct.name)
         .join(Product, Product.category_id == CategoryProduct.id)
-        .where(CategoryProduct.is_active == True, Product.is_active == True, *filters)
+        .where(CategoryProduct.is_active == True, _IS_ACTIVE, *filters)
+        .order_by(CategoryProduct.name)
         .distinct()
     )
     return db.execute(query).all()
@@ -100,7 +102,8 @@ def rep_get_brands(db: Session, search: str | None):
     filters = _build_search_filter(search)
     query = (
         select(Product.brand)
-        .where(Product.is_active == True, *filters)
+        .where(_IS_ACTIVE, *filters)
+        .order_by(Product.brand)
         .distinct()
     )
     return db.execute(query).all()
