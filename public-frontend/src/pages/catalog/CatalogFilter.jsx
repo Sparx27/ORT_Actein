@@ -1,9 +1,14 @@
 import { useState } from 'react'
 import ContentBox from '../../shared_components/ContentBox'
+import useProducts from '../../hooks/useProducts'
+import useCatalogParams from '../../hooks/useCatalogParams'
+import Button from '../../shared_components/Button'
 
 
 const CatalogFilter = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const { currentParams, setCurrentParams } = useCatalogParams()
+  const { productsQuery } = useProducts({ ...currentParams })
 
   return (
     <div className="catalog-filter-form-wrap">
@@ -35,25 +40,42 @@ const CatalogFilter = () => {
       <ContentBox design={`filter-form-wrap ${!isOpen ? 'collapsed' : ''}`}>
         <aside>
           <div className="catalog-filter-header">
-            <h2 className="catalog-filter-title">Filtros</h2>
-            <button className="catalog-filter-clear-btn">Limpiar</button>
+            <h2 className="catalog-filter-title">Filtrar por</h2>
+            <button
+              className="catalog-filter-clear-btn"
+              onClick={() => setCurrentParams({})}
+            >Limpiar</button>
           </div>
 
           <div className="catalog-filter-group">
             <span className="catalog-filter-group-label">Categoría</span>
-            <select className="catalog-filter-select" defaultValue="">
+            <select
+              className="catalog-filter-select"
+              value={currentParams?.category_id ?? ''}
+              onChange={(e) => setCurrentParams({ ...currentParams, category_id: e.target.value })}
+            >
               <option value="">Todas las categorías</option>
-              <option value="camaras">Cámaras frigoríficas</option>
-              <option value="exhibidoras">Exhibidoras comerciales</option>
+              {
+                productsQuery.data?.filters?.categories && (
+                  productsQuery.data.filters.categories.map(cat => <option key={`cat-${cat.id}`} value={cat.id}>{cat.name}</option>)
+                )
+              }
             </select>
           </div>
 
           <div className="catalog-filter-group">
             <span className="catalog-filter-group-label">Marca</span>
-            <select className="catalog-filter-select" defaultValue="">
+            <select
+              className="catalog-filter-select"
+              value={currentParams?.brand ?? ''}
+              onChange={(e) => setCurrentParams({ ...currentParams, brand: e.target.value })}
+            >
               <option value="">Todas las marcas</option>
-              <option value="bohn">Bohn</option>
-              <option value="heatcraft">Heatcraft</option>
+              {
+                productsQuery.data?.filters?.brands && (
+                  productsQuery.data.filters.brands.map(b => <option key={`b-${b}`} value={b}>{b}</option>)
+                )
+              }
             </select>
           </div>
 
