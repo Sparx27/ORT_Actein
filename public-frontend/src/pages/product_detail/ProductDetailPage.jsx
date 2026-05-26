@@ -9,6 +9,7 @@ import ProductServices from './ProductServices'
 import MessageBox from '../../shared_components/MessageBox'
 import Breadcrumb from '../../shared_components/breadcrumb/Breadcrumb'
 import MessageText from '../../shared_components/MessageText'
+import { buildCatalogPath } from '../../utils/productDataUtils'
 
 const ProductDetailPage = () => {
   const { id } = useParams()
@@ -29,22 +30,18 @@ const ProductDetailPage = () => {
   const productLabel = productQuery.data?.name ?? `Producto #${id}`
   const categoryId = productQuery.data?.category_id
 
-  const backPath = state?.fromPage
-    ? `/productos?page=${state.fromPage}${state.fromCategory ? `&categoria=${state.fromCategory}` : ''}`
-    : '/productos'
+  const catalogPath = buildCatalogPath(state ?? {})
 
-  const categoryPath = state?.fromCategory
-    ? `/productos?page=${state.fromPage}&categoria=${state.fromCategory}`
-    : categoryId
-      ? `/productos?page=1&categoria=${categoryId}`
-      : '/productos?page=1'
+  const categoryPath = (state?.category_id && String(state.category_id) === String(categoryId))
+    ? buildCatalogPath({ page: state.page, category_id: categoryId })
+    : buildCatalogPath({ page: 1, category_id: categoryId })
 
   return (
     <section className="product-detail">
       <Breadcrumb
         categoryLabel={categoryLabel}
         productLabel={productLabel}
-        backPath={backPath}
+        catalogPath={catalogPath}
         categoryPath={categoryPath} />
       <div className="page-padding">
         <Container>

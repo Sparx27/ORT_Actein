@@ -6,8 +6,8 @@ import MessageText from '../../shared_components/MessageText'
 import useCatalogParams from '../../hooks/useCatalogParams'
 
 const ProductsList = () => {
-  const { page, category, setPage } = useCatalogParams()
-  const { productsQuery } = useProducts(page)
+  const { page, currentParams, setPage } = useCatalogParams()
+  const { productsQuery } = useProducts({ page, ...currentParams })
 
   if (productsQuery.isLoading) return <MessageText message={'Obteniendo productos...'} type={'info'} />
   if (productsQuery.error) return <MessageBox message={productsQuery.error.message} type="error" />
@@ -35,8 +35,7 @@ const ProductsList = () => {
           products.map(p => <ProductCard
             key={p.id}
             product={p}
-            page={page}
-            activeCategory={category}
+            currentParams={currentParams}
           />)
         )}
       </div>

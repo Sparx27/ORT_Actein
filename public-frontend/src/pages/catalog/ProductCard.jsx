@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
 import ContentBox from '../../shared_components/ContentBox'
 
-const ProductCard = ({ product, page, activeCategory }) => {
+const ProductCard = ({ product, currentParams }) => {
   const { id, name, category_name, brand } = product
 
   return (
-    <ContentBox>
+    <div className="product-card-box">
       <article className="product-card">
         <div className="card-image">
           <img />
@@ -17,7 +17,7 @@ const ProductCard = ({ product, page, activeCategory }) => {
           <div className="card-actions">
             <Link
               className="btn-detalle" to={`/productos/${id}`}
-              state={{ fromPage: page, fromCategory: activeCategory }}
+              state={currentParams}
             >
               Ver detalle
             </Link>
@@ -27,7 +27,7 @@ const ProductCard = ({ product, page, activeCategory }) => {
           </div>
         </div>
       </article>
-    </ContentBox>
+    </div>
   )
 }
 
