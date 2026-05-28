@@ -1,18 +1,15 @@
-import { useState } from 'react'
+import { useRef } from 'react'
 import Container from '../../shared_components/Container'
+import useCatalogParams from '../../hooks/useCatalogParams'
 
 
 const CatalogSearch = () => {
-  const [search, setSearch] = useState()
+  const { currentParams, setCurrentParams } = useCatalogParams()
+  const inputRef = useRef(null)
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(e)
-    console.log(search)
-  }
-
-  const handleInputChange = (e) => {
-    setSearch(e.value)
+    setCurrentParams({ search: inputRef.current.value })
   }
 
   return (
@@ -28,12 +25,12 @@ const CatalogSearch = () => {
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
               <input
+                ref={inputRef}
                 type="text"
+                defaultValue={currentParams?.search ?? ''}
                 className="search-input"
-                id="searchInput"
                 placeholder="Nombre o especificación técnica..."
                 maxLength="120"
-                onChange={handleInputChange}
               />
             </div>
             <button type="submit" className="form-search-btn">Buscar</button>

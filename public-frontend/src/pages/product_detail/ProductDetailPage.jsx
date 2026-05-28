@@ -33,8 +33,8 @@ const ProductDetailPage = () => {
   const catalogPath = buildCatalogPath(state ?? {})
 
   const categoryPath = (state?.category_id && String(state.category_id) === String(categoryId))
-    ? buildCatalogPath({ page: state.page, category_id: categoryId })
-    : buildCatalogPath({ page: 1, category_id: categoryId })
+    ? buildCatalogPath({ page: state.page, category_id: categoryId, search: state.search })
+    : buildCatalogPath({ page: 1, category_id: categoryId, search: state.search })
 
   return (
     <section className="product-detail">
