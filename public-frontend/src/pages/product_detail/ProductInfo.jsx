@@ -4,7 +4,7 @@ import SvgWrench from '../../shared_components/svg/SvgWrench'
 
 const ProductInfo = ({ info }) => {
   // Falta requiere instalacion
-  const { name, category_name, brand } = info
+  const { name, category_name, brand, requires_installation } = info
 
   return (
     <ContentBox design={'product-info'}>
@@ -13,10 +13,12 @@ const ProductInfo = ({ info }) => {
           <SvgTag />
           {category_name}
         </li>
-        <li className="product-info-tag-install">
-          <SvgWrench w={'11'} h={'11'} />
-          Requiere instalación
-        </li>
+        {requires_installation && (
+          <li className="product-info-tag-install">
+            <SvgWrench w={'11'} h={'11'} />
+            Requiere instalación
+          </li>
+        )}
       </ul>
 
       <h1 className="product-info-title">{name}</h1>
