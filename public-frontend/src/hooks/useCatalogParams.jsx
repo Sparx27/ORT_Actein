@@ -27,7 +27,7 @@ const useCatalogParams = () => {
       if (search) prev.set('busqueda', search)
       if (category_id) prev.set('categoria', category_id)
       if (brand) prev.set('marca', brand)
-      if (installation) prev.set('marca', installation)
+      if (installation) prev.set('instalacion', installation)
 
       prev.set('pagina', 1)
       return prev
