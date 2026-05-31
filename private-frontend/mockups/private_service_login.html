@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesión — Sistema Interno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --navy: #0c1f3d;
+      --navy-light: #1a3256;
+      --navy-hover: #243f6b;
+      --teal: #0e7490;
+      --teal-hover: #0c6478;
+      --teal-bg: #ecfeff;
+      --white: #ffffff;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --gray-900: #0f172a;
+      --danger-bg: #fee2e2;
+      --danger-tx: #991b1b;
+      --danger-bd: #fecaca;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --font-main: 'Inter', system-ui, sans-serif;
+      --font-head: 'Sora', system-ui, sans-serif;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--gray-50);
+      color: var(--gray-900);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── LAYOUT 2 COLUMNAS ── */
+    .auth-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── PANEL IZQUIERDO (MARCA) ── */
+    .brand-panel {
+      background: var(--navy);
+      color: var(--white);
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decoración geométrica sutil de fondo */
+    .brand-panel::before {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      right: -180px;
+      top: -160px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.18), transparent 65%);
+      pointer-events: none;
+    }
+
+    .brand-panel::after {
+      content: "";
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      left: -120px;
+      bottom: -140px;
+      background: radial-gradient(circle, rgba(14, 116, 144, 0.30), transparent 65%);
+      pointer-events: none;
+    }
+
+    .brand-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: #38bdf8;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      font-weight: 400;
+    }
+
+    .brand-message {
+      position: relative;
+      z-index: 1;
+      max-width: 420px;
+    }
+
+    .brand-message h2 {
+      font-family: var(--font-head);
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 14px;
+    }
+
+    .brand-message p {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.6;
+    }
+
+    .brand-footer {
+      position: relative;
+      z-index: 1;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* ── PANEL DERECHO (FORMULARIO) ── */
+    .form-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    /* Logo que solo aparece en mobile (cuando el panel de marca se oculta) */
+    .mobile-brand {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .mobile-brand .brand-name {
+      color: var(--gray-900);
+    }
+
+    .mobile-brand .brand-sub {
+      color: var(--gray-400);
+    }
+
+    .form-head {
+      margin-bottom: 28px;
+    }
+
+    .form-head h1 {
+      font-family: var(--font-head);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 6px;
+    }
+
+    .form-head p {
+      font-size: 14px;
+      color: var(--gray-500);
+    }
+
+    /* ── CAMPOS ── */
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 7px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--gray-400);
+      display: flex;
+      pointer-events: none;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      height: 44px;
+      padding: 0 12px 0 40px;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      background: var(--gray-50);
+      color: var(--gray-900);
+      font-size: 14px;
+      font-family: var(--font-main);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    .input-wrap input::placeholder {
+      color: var(--gray-400);
+    }
+
+    .input-wrap input:focus {
+      border-color: var(--teal);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.12);
+    }
+
+    /* Padding extra a la derecha cuando hay botón de mostrar/ocultar */
+    .input-wrap.has-toggle input {
+      padding-right: 44px;
+    }
+
+    /* Botón de mostrar/ocultar contraseña */
+    .toggle-pass {
+      position: absolute;
+      right: 8px;
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: transparent;
+      color: var(--gray-400);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      transition: color 0.12s, background 0.12s;
+    }
+
+    .toggle-pass:hover {
+      color: var(--teal);
+      background: var(--teal-bg);
+    }
+
+    /* Estado de error en un campo */
+    .field.error .input-wrap input {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .field-hint {
+      display: none;
+      font-size: 12px;
+      color: var(--danger-tx);
+      margin-top: 6px;
+    }
+
+    .field.error .field-hint {
+      display: block;
+    }
+
+    /* ── BANNER DE ERROR GENERAL ── */
+    .alert {
+      display: none;
+      align-items: flex-start;
+      gap: 8px;
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-bd);
+      color: var(--danger-tx);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+    }
+
+    .alert.show {
+      display: flex;
+    }
+
+    .alert svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── BOTÓN PRINCIPAL ── */
+    .btn-submit {
+      width: 100%;
+      height: 46px;
+      background: var(--teal);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: var(--teal-hover);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    /* Spinner del estado "cargando" */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 880px) {
+      .auth-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .brand-panel {
+        display: none;
+      }
+
+      .mobile-brand {
+        display: flex;
+      }
+
+      .form-panel {
+        padding: 32px 20px;
+      }
+
+      .mobile-brand .brand-icon svg {
+        stroke: var(--navy);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="auth-shell">
+
+    <!-- ░░ PANEL IZQUIERDO: MARCA (oculto en mobile) ░░ -->
+    <aside class="brand-panel">
+      <div class="brand-top">
+
+
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0c1f3d" stroke-width="2.2">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+          </svg>
+        </div>
+
+
+        <div>
+          <div class="brand-name">Sistema Interno</div>
+          <div class="brand-sub">Gestión comercial</div>
+        </div>
+      </div>
+
+      <div class="brand-message">
+        <h2>Gestioná procesos de venta y cotizaciones en un solo lugar.</h2>
+        <p>Panel de administración interno. Acceso restringido a personal autorizado.</p>
+      </div>
+
+      <div class="brand-footer">© 2026 Actein — Uso interno</div>
+    </aside>
+
+    <!-- ░░ PANEL DERECHO: FORMULARIO ░░ -->
+    <main class="form-panel">
+      <div class="form-card">
+
+        <!-- Logo visible solo en mobile -->
+        <div class="mobile-brand">
+          <div class="brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0c1f3d" stroke-width="2.2">
+              <rect x="2" y="3" width="20" height="14" rx="2" />
+              <line x1="8" y1="21" x2="16" y2="21" />
+              <line x1="12" y1="17" x2="12" y2="21" />
+            </svg>
+          </div>
+          <div>
+            <div class="brand-name">Sistema Interno</div>
+            <div class="brand-sub">Gestión comercial</div>
+          </div>
+        </div>
+
+        <div class="form-head">
+          <h1>Iniciar sesión</h1>
+          <p>Ingresá tus credenciales para acceder al panel.</p>
+        </div>
+
+        <!-- Banner de error general (credenciales inválidas) -->
+        <div class="alert" id="alertBox">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span id="alertText">Email o contraseña incorrectos.</span>
+        </div>
+
+        <!-- Campo: Email -->
+        <div class="field" id="fieldEmail">
+          <label class="field-label" for="email">Email</label>
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="m22 7-10 6L2 7" />
+              </svg>
+            </span>
+            <input type="email" id="email" placeholder="nombre@empresa.com" autocomplete="username">
+          </div>
+          <span class="field-hint" id="hintEmail">Ingresá un email válido.</span>
+        </div>
+
+        <!-- Campo: Contraseña -->
+        <div class="field" id="fieldPass">
+          <label class="field-label" for="password">Contraseña</label>
+          <div class="input-wrap has-toggle">
+            <span class="input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </span>
+            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+            <button type="button" class="toggle-pass" id="togglePass" aria-label="Mostrar contraseña">
+              <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.8">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          </div>
+          <span class="field-hint" id="hintPass">La contraseña es obligatoria.</span>
+        </div>
+
+        <button class="btn-submit" id="btnSubmit">Iniciar sesión</button>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    // ───────────────────────────────────────────────────────────
+    // Referencias a los elementos del DOM que vamos a manipular.
+    // document.getElementById busca un elemento por su atributo id.
+    // ───────────────────────────────────────────────────────────
+    const emailInput = document.getElementById('email');
+    const passInput = document.getElementById('password');
+    const fieldEmail = document.getElementById('fieldEmail');
+    const fieldPass = document.getElementById('fieldPass');
+    const alertBox = document.getElementById('alertBox');
+    const alertText = document.getElementById('alertText');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const togglePass = document.getElementById('togglePass');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    // Expresión regular simple para validar el formato del email.
+    // .test(valor) devuelve true si el texto coincide con el patrón.
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // ───────────────────────────────────────────────────────────
+    // MOSTRAR / OCULTAR CONTRASEÑA
+    // Cambiamos el atributo type del input entre "password" y "text".
+    // ───────────────────────────────────────────────────────────
+    togglePass.addEventListener('click', () => {
+      const visible = passInput.type === 'text';
+      passInput.type = visible ? 'password' : 'text';
+      togglePass.setAttribute('aria-label', visible ? 'Mostrar contraseña' : 'Ocultar contraseña');
+      // Cambiamos el ícono: ojo abierto vs ojo tachado.
+      eyeIcon.innerHTML = visible
+        ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+        : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    });
+
+    // ───────────────────────────────────────────────────────────
+    // Funciones auxiliares para marcar / limpiar errores en un campo.
+    // classList.add / .remove agregan o quitan una clase CSS,
+    // que es la que dispara los estilos rojos definidos arriba.
+    // ───────────────────────────────────────────────────────────
+    function setError(field, msg) {
+      field.classList.add('error');
+      if (msg) field.querySelector('.field-hint').textContent = msg;
+    }
+    function clearError(field) {
+      field.classList.remove('error');
+    }
+
+    // ───────────────────────────────────────────────────────────
+    // VALIDACIÓN del formulario.
+    // Devuelve true si todo está bien; va marcando los campos con error.
+    // .trim() elimina espacios al inicio y final del texto.
+    // ───────────────────────────────────────────────────────────
+    function validate() {
+      let ok = true;
+      alertBox.classList.remove('show'); // ocultamos el banner previo
+
+      const email = emailInput.value.trim();
+      const pass = passInput.value;
+
+      if (!EMAIL_RE.test(email)) {
+        setError(fieldEmail, email ? 'Ingresá un email válido.' : 'El email es obligatorio.');
+        ok = false;
+      } else {
+        clearError(fieldEmail);
+      }
+
+      if (pass.length === 0) {
+        setError(fieldPass, 'La contraseña es obligatoria.');
+        ok = false;
+      } else {
+        clearError(fieldPass);
+      }
+
+      return ok;
+    }
+
+    // Al escribir de nuevo en un campo, limpiamos su error.
+    emailInput.addEventListener('input', () => clearError(fieldEmail));
+    passInput.addEventListener('input', () => clearError(fieldPass));
+
+    // ───────────────────────────────────────────────────────────
+    // ENVÍO (simulado). En la app real, acá iría la llamada
+    // al endpoint de login del private-service contra auth.USUARIO.
+    // ───────────────────────────────────────────────────────────
+    btnSubmit.addEventListener('click', () => {
+      if (!validate()) return;
+
+      // Estado "cargando": deshabilitamos el botón y mostramos el spinner.
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<span class="spinner"></span> Ingresando…';
+
+      // setTimeout simula la espera de la respuesta del servidor (1.2 s).
+      setTimeout(() => {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Iniciar sesión';
+
+        // En el mockup mostramos siempre el error de credenciales
+        // para demostrar cómo se ve. En producción esto depende
+        // de la respuesta real del backend.
+        alertText.textContent = 'Email o contraseña incorrectos.';
+        alertBox.classList.add('show');
+      }, 1200);
+    });
+
+    // Permitir enviar con la tecla Enter desde cualquiera de los inputs.
+    [emailInput, passInput].forEach(el => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') btnSubmit.click();
+      });
+    });
+  </script>
+</body>
+
+</html>
