@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PV-007 — Detalle del proceso de venta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:       #0c1f3d;
+  --navy-light: #1a3256;
+  --teal:       #0e7490;
+  --teal-hover: #0c6478;
+  --teal-bg:    #ecfeff;
+  --white:      #ffffff;
+  --gray-50:    #f8fafc;
+  --gray-100:   #f1f5f9;
+  --gray-200:   #e2e8f0;
+  --gray-300:   #cbd5e1;
+  --gray-400:   #94a3b8;
+  --gray-500:   #64748b;
+  --gray-600:   #475569;
+  --gray-700:   #334155;
+  --gray-900:   #0f172a;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.14);
+  --sidebar-w:  228px;
+  --topbar-h:   56px;
+  --font-main:  'Inter', system-ui, sans-serif;
+  --font-head:  'Sora', system-ui, sans-serif;
+}
+html, body { height: 100%; }
+body { font-family: var(--font-main); background: var(--gray-50); color: var(--gray-900); font-size: 14px; line-height: 1.5; display: flex; }
+
+/* ── SIDEBAR ── */
+.sidebar { width: var(--sidebar-w); background: var(--navy); min-height: 100vh; display: flex; flex-direction: column; position: fixed; left:0; top:0; bottom:0; z-index:50; overflow-y:auto; }
+.sidebar-brand { padding: 0 20px; height: var(--topbar-h); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.07); flex-shrink:0; }
+.brand-icon { width:30px; height:30px; background:#38bdf8; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.brand-name { font-family: var(--font-head); font-size:14px; font-weight:700; color:var(--white); line-height:1.2; }
+.brand-sub  { font-size:10px; color:rgba(255,255,255,0.4); font-family:var(--font-main); }
+.nav-section { padding: 20px 12px 8px; }
+.nav-label   { font-size:10px; font-weight:600; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.08em; padding:0 8px; margin-bottom:6px; }
+.nav-item    { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:var(--radius-sm); color:rgba(255,255,255,0.6); font-size:13.5px; font-weight:500; cursor:pointer; transition:background .12s,color .12s; text-decoration:none; margin-bottom:2px; }
+.nav-item:hover  { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.9); }
+.nav-item.active { background:rgba(14,116,144,0.35); color:#fff; }
+.nav-item.active .ni { color:#38bdf8; }
+.ni { width:16px; height:16px; flex-shrink:0; opacity:.8; }
+.nav-item.active .ni { opacity:1; }
+.sidebar-footer { margin-top:auto; padding:12px; border-top:1px solid rgba(255,255,255,0.07); }
+.user-card { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius-sm); cursor:pointer; transition:background .12s; }
+.user-card:hover { background:rgba(255,255,255,0.07); }
+.user-avatar { width:32px; height:32px; border-radius:50%; background:#1a3256; border:1.5px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#38bdf8; flex-shrink:0; }
+.user-name { font-size:13px; font-weight:500; color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.user-role { font-size:11px; color:rgba(255,255,255,0.4); }
+
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar-w); flex:1; min-width:0; display:flex; flex-direction:column; min-height:100vh; }
+.topbar { background:var(--white); border-bottom:1px solid var(--gray-200); height:var(--topbar-h); display:flex; align-items:center; justify-content:space-between; padding:0 28px; position:sticky; top:0; z-index:40; gap:12px; }
+.breadcrumb { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--gray-400); flex-wrap:wrap; }
+.breadcrumb a { color:var(--gray-400); text-decoration:none; cursor:pointer; }
+.breadcrumb a:hover { color:var(--teal); }
+.breadcrumb span { color:var(--gray-700); font-weight:500; }
+.bc-sep { color:var(--gray-300); }
+
+/* ── PAGE ── */
+.page { padding:24px 28px 48px; flex:1; }
+
+/* ── PROCESS HEADER ── */
+.proc-header {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.proc-id-wrap { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.proc-id { font-size:12px; color:var(--gray-400); font-family:monospace; background:var(--gray-100); padding:3px 8px; border-radius:var(--radius-sm); }
+.proc-title { font-family:var(--font-head); font-size:20px; font-weight:700; color:var(--gray-900); }
+.badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; white-space:nowrap; }
+.badge-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.s-facturado { background:#d1fae5; color:#065f46; } .s-facturado .badge-dot { background:#10b981; }
+.s-cerrado   { background:#f1f5f9; color:#475569; } .s-cerrado .badge-dot   { background:#94a3b8; }
+.s-perdida   { background:#fee2e2; color:#991b1b; } .s-perdida .badge-dot   { background:#ef4444; }
+
+.proc-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.btn-primary { display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 16px; background:var(--teal); color:var(--white); font-size:13px; font-weight:600; border:none; border-radius:var(--radius-md); cursor:pointer; font-family:var(--font-main); transition:background .15s; white-space:nowrap; }
+.btn-primary:hover { background:var(--teal-hover); }
+.btn-secondary { display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 16px; background:var(--white); color:var(--gray-700); font-size:13px; font-weight:500; border:1px solid var(--gray-200); border-radius:var(--radius-md); cursor:pointer; font-family:var(--font-main); transition:background .12s,border-color .12s; white-space:nowrap; }
+.btn-secondary:hover { background:var(--gray-50); border-color:var(--gray-300); }
+.btn-danger { display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 16px; background:var(--white); color:#991b1b; font-size:13px; font-weight:500; border:1px solid #fca5a5; border-radius:var(--radius-md); cursor:pointer; font-family:var(--font-main); transition:background .12s; white-space:nowrap; }
+.btn-danger:hover { background:#fff1f2; }
+
+/* ── TWO-COL LAYOUT ── */
+.layout { display:grid; grid-template-columns: 340px 1fr; gap:20px; align-items:start; }
+
+/* ── CARDS ── */
+.card { background:var(--white); border:1px solid var(--gray-200); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); margin-bottom:16px; overflow:hidden; }
+.card:last-child { margin-bottom:0; }
+.card-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--gray-100); }
+.card-header h3 { font-size:13px; font-weight:600; color:var(--gray-700); }
+.card-body { padding:16px 18px; }
+.btn-edit { display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 10px; background:var(--white); color:var(--gray-500); font-size:12px; font-weight:500; border:1px solid var(--gray-200); border-radius:var(--radius-sm); cursor:pointer; font-family:var(--font-main); transition:all .12s; }
+.btn-edit:hover { background:var(--teal-bg); color:var(--teal); border-color:var(--teal); }
+
+/* ── FIELD ROWS ── */
+.field-row { display:flex; flex-direction:column; gap:2px; margin-bottom:14px; }
+.field-row:last-child { margin-bottom:0; }
+.field-label { font-size:11px; font-weight:600; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.05em; }
+.field-value { font-size:13.5px; color:var(--gray-900); font-weight:500; }
+.field-value.muted { color:var(--gray-500); font-weight:400; }
+.field-value.empty { color:var(--gray-300); font-style:italic; font-weight:400; }
+.field-divider { height:1px; background:var(--gray-100); margin:14px 0; }
+
+/* ── ESTADO TIMELINE (simplified) ── */
+.estado-info { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.next-state { font-size:12px; color:var(--gray-500); }
+.next-state strong { color:var(--gray-700); }
+
+/* ── TABS ── */
+.tabs-wrap { background:var(--white); border:1px solid var(--gray-200); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; }
+.tabs-nav { display:flex; border-bottom:1px solid var(--gray-200); background:var(--gray-50); }
+.tab-btn { flex:1; padding:13px 16px; font-size:13px; font-weight:500; color:var(--gray-500); background:none; border:none; cursor:pointer; font-family:var(--font-main); border-bottom:2px solid transparent; transition:color .12s,border-color .12s; white-space:nowrap; }
+.tab-btn:hover  { color:var(--gray-700); }
+.tab-btn.active { color:var(--teal); border-bottom-color:var(--teal); background:var(--white); font-weight:600; }
+.tab-content { display:none; padding:0; }
+.tab-content.active { display:block; }
+.tab-toolbar { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--gray-100); }
+.tab-toolbar h4 { font-size:13px; font-weight:600; color:var(--gray-600); }
+
+/* ── TABLE INSIDE TAB ── */
+.inner-table { width:100%; border-collapse:collapse; font-size:13px; }
+.inner-table th { text-align:left; padding:10px 18px; font-size:11px; font-weight:600; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.05em; background:var(--gray-50); border-bottom:1px solid var(--gray-100); white-space:nowrap; }
+.inner-table td { padding:12px 18px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); vertical-align:middle; }
+.inner-table tr:last-child td { border-bottom:none; }
+.inner-table tr:hover td { background:var(--gray-50); }
+.td-name { font-weight:500; color:var(--gray-900); }
+.td-sub  { font-size:11px; color:var(--gray-400); margin-top:1px; }
+.row-act { display:flex; gap:5px; opacity:0; transition:opacity .15s; }
+.inner-table tr:hover .row-act { opacity:1; }
+.btn-icon { width:28px; height:28px; border-radius:var(--radius-sm); border:1px solid var(--gray-200); background:var(--white); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-400); transition:all .12s; }
+.btn-icon:hover { background:var(--teal-bg); color:var(--teal); border-color:var(--teal); }
+.btn-icon.danger:hover { background:#fff1f2; color:#991b1b; border-color:#fca5a5; }
+
+/* ── SERVICE STATUS BADGE ── */
+.svc-badge { display:inline-flex; align-items:center; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
+.svc-pendiente  { background:#fef9c3; color:#854d0e; }
+.svc-en-curso   { background:#dbeafe; color:#1e40af; }
+.svc-finalizado { background:#dcfce7; color:#14532d; }
+.svc-cancelado  { background:#f1f5f9; color:#475569; }
+
+/* ── NOTAS ── */
+.notas-list { padding:16px 18px; display:flex; flex-direction:column; gap:12px; }
+.nota-item { border-left:3px solid var(--gray-200); padding:10px 14px; background:var(--gray-50); border-radius:0 var(--radius-sm) var(--radius-sm) 0; }
+.nota-meta { font-size:11px; color:var(--gray-400); margin-bottom:4px; }
+.nota-meta strong { color:var(--gray-600); font-weight:600; }
+.nota-text { font-size:13px; color:var(--gray-700); line-height:1.55; }
+.nota-add { display:flex; gap:10px; padding:14px 18px; border-top:1px solid var(--gray-100); align-items:flex-end; }
+.nota-textarea { flex:1; border:1px solid var(--gray-200); border-radius:var(--radius-md); padding:10px 12px; font-size:13px; font-family:var(--font-main); color:var(--gray-900); resize:none; min-height:70px; outline:none; transition:border-color .15s; background:var(--white); }
+.nota-textarea:focus { border-color:var(--teal); }
+.nota-textarea::placeholder { color:var(--gray-300); }
+
+/* ── COTIZACION CARD ── */
+.cotiz-card { background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%); border:1px solid #bae6fd; border-radius:var(--radius-lg); padding:16px 18px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.cotiz-info h4 { font-size:13px; font-weight:600; color:#0c4a6e; margin-bottom:3px; }
+.cotiz-info p  { font-size:12px; color:#0369a1; }
+.cotiz-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.btn-cotiz { display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 14px; border-radius:var(--radius-sm); font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font-main); border:none; transition:background .12s; }
+.btn-cotiz.primary { background:#0284c7; color:white; }
+.btn-cotiz.primary:hover { background:#0369a1; }
+.btn-cotiz.secondary { background:white; color:#0369a1; border:1px solid #bae6fd; }
+.btn-cotiz.secondary:hover { background:#f0f9ff; }
+
+/* ── TOTAL ROW ── */
+.total-row { display:flex; align-items:center; justify-content:flex-end; gap:24px; padding:12px 18px; background:var(--gray-50); border-top:1px solid var(--gray-100); font-size:13px; }
+.total-label { color:var(--gray-500); }
+.total-amount { font-size:16px; font-weight:700; color:var(--gray-900); font-family:var(--font-head); }
+
+/* ── EMPTY TAB ── */
+.tab-empty { text-align:center; padding:40px 24px; color:var(--gray-400); }
+.tab-empty svg { display:block; margin:0 auto 10px; opacity:.2; }
+.tab-empty p { font-size:13px; }
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,0.45); z-index:200; display:flex; align-items:center; justify-content:center; padding:24px; opacity:0; pointer-events:none; transition:opacity .2s; }
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal { background:var(--white); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); width:100%; max-width:480px; overflow:hidden; transform:translateY(12px); transition:transform .2s; }
+.modal-overlay.open .modal { transform:translateY(0); }
+.modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--gray-100); }
+.modal-header h3 { font-size:15px; font-weight:600; color:var(--gray-900); }
+.modal-close { width:30px; height:30px; border-radius:var(--radius-sm); border:none; background:none; cursor:pointer; color:var(--gray-400); display:flex; align-items:center; justify-content:center; transition:background .12s; }
+.modal-close:hover { background:var(--gray-100); }
+.modal-body { padding:20px 22px; display:flex; flex-direction:column; gap:14px; }
+.form-group { display:flex; flex-direction:column; gap:5px; }
+.form-label { font-size:12px; font-weight:600; color:var(--gray-500); }
+.form-input, .form-select, .form-textarea { border:1px solid var(--gray-200); border-radius:var(--radius-sm); padding:9px 11px; font-size:13px; font-family:var(--font-main); color:var(--gray-900); outline:none; transition:border-color .15s; background:var(--white); width:100%; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--teal); }
+.form-textarea { resize:none; min-height:80px; }
+.form-select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:30px; }
+.modal-footer { display:flex; justify-content:flex-end; gap:8px; padding:14px 22px; border-top:1px solid var(--gray-100); background:var(--gray-50); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+/* ── AVANCE ESTADO MODAL ── */
+.estado-steps { display:flex; flex-direction:column; gap:8px; }
+.estado-option { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--gray-200); border-radius:var(--radius-md); cursor:pointer; transition:all .12s; }
+.estado-option:hover { border-color:var(--teal); background:var(--teal-bg); }
+.estado-option input { accent-color:var(--teal); width:16px; height:16px; cursor:pointer; }
+.estado-option-label { font-size:13px; font-weight:500; color:var(--gray-700); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) { .layout { grid-template-columns:1fr; } }
+@media (max-width: 768px) { .sidebar { display:none; } .main { margin-left:0; } .page { padding:16px; } .topbar { padding:0 16px; } }
+@media (max-width: 540px) { .proc-header { flex-direction:column; } .proc-actions { width:100%; justify-content:flex-end; } .tab-btn { font-size:12px; padding:11px 10px; } }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0c1f3d" stroke-width="2.2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">Sistema Interno</div>
+      <div class="brand-sub">Gestión comercial</div>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Principal</div>
+    <a class="nav-item" href="#"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Inicio</a>
+    <a class="nav-item active" href="#"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Procesos de venta</a>
+    <a class="nav-item" href="#"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Empresas</a>
+    <a class="nav-item" href="#"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Contactos</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Catálogo</div>
+    <a class="nav-item" href="#"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Productos</a>
+    <a class="nav-item" href="#"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Servicios</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Operativo</div>
+    <a class="nav-item" href="#"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Mantenimiento</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">CG</div>
+      <div>
+        <div class="user-name">Cristian García</div>
+        <div class="user-role">Administrativo</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="topbar">
+    <div class="breadcrumb">
+      <a href="#">Inicio</a><span class="bc-sep">›</span>
+      <a href="#">Procesos de venta</a><span class="bc-sep">›</span>
+      <span>PV-007</span>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- PROCESS HEADER -->
+    <div class="proc-header">
+      <div>
+        <div class="proc-id-wrap" style="margin-bottom:8px;">
+          <span class="proc-id">PV-007</span>
+          <span class="badge s-facturado"><span class="badge-dot"></span>Facturado</span>
+        </div>
+        <div class="proc-title">Farmacia Central — Split 12000 BTU</div>
+      </div>
+      <div class="proc-actions">
+        <button class="btn-danger" onclick="openModal('modalPerdida')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Marcar como perdida
+        </button>
+        <button class="btn-primary" onclick="openModal('modalEstado')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"/></svg>
+          Avanzar estado
+        </button>
+      </div>
+    </div>
+
+    <!-- COTIZACIÓN CARD (RF59 / RF60) -->
+    <div class="cotiz-card">
+      <div class="cotiz-info">
+        <h4>Cotización disponible</h4>
+        <p>Generada el 04/03/2026 · 2 líneas de producto · Total: U$S 3.480</p>
+      </div>
+      <div class="cotiz-actions">
+        <button class="btn-cotiz secondary" onclick="openModal('modalCotiz')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Ver cotización
+        </button>
+        <button class="btn-cotiz primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- TWO-COL LAYOUT -->
+    <div class="layout">
+
+      <!-- LEFT: DATA CARDS -->
+      <div>
+
+        <!-- Datos generales -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Datos generales</h3>
+            <button class="btn-edit" onclick="openModal('modalGenerales')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Editar
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="field-row">
+              <span class="field-label">Empresa cliente</span>
+              <span class="field-value">Farmacia Central</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Contacto principal</span>
+              <span class="field-value">María López</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Empleado responsable</span>
+              <span class="field-value">Cristian García</span>
+            </div>
+            <div class="field-divider"></div>
+            <div class="field-row">
+              <span class="field-label">Descripción</span>
+              <span class="field-value muted">Equipo split inverter 12000 BTU para sala de medicamentos refrigerados.</span>
+            </div>
+            <div class="field-divider"></div>
+            <div class="field-row">
+              <span class="field-label">Fecha primer contacto</span>
+              <span class="field-value muted">02/03/2026</span>
+            </div>
+            <div class="field-row" style="margin-bottom:0">
+              <span class="field-label">Última actualización</span>
+              <span class="field-value muted">28/03/2026 — 14:32</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datos comerciales (RF26 — desde VENTA_CONFIRMADA) -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Datos comerciales</h3>
+            <button class="btn-edit" onclick="openModal('modalComercial')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Editar
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="field-row">
+              <span class="field-label">Monto de venta final</span>
+              <span class="field-value">U$S 3.480</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Fecha de entrega prometida</span>
+              <span class="field-value muted">20/03/2026</span>
+            </div>
+            <div class="field-row" style="margin-bottom:0">
+              <span class="field-label">Fecha de entrega real</span>
+              <span class="field-value muted">22/03/2026</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datos de facturación (RF27 — desde FACTURADO) -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Facturación</h3>
+            <button class="btn-edit" onclick="openModal('modalFacturacion')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Editar
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="field-row">
+              <span class="field-label">Número de factura</span>
+              <span class="field-value">A 0001-00004821</span>
+            </div>
+            <div class="field-row" style="margin-bottom:0">
+              <span class="field-label">Fecha de pago</span>
+              <span class="field-value muted">28/03/2026</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /left -->
+
+      <!-- RIGHT: TABS -->
+      <div class="tabs-wrap">
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="switchTab('lineas', this)">Líneas de producto</button>
+          <button class="tab-btn" onclick="switchTab('servicios', this)">Servicios</button>
+          <button class="tab-btn" onclick="switchTab('notas', this)">Notas</button>
+        </div>
+
+        <!-- TAB: LÍNEAS (RF54) -->
+        <div class="tab-content active" id="tab-lineas">
+          <div class="tab-toolbar">
+            <h4>2 líneas registradas</h4>
+            <button class="btn-secondary" style="height:32px;font-size:12px;" onclick="openModal('modalLinea')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Agregar línea
+            </button>
+          </div>
+          <table class="inner-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th style="width:70px;text-align:right;">Cant.</th>
+                <th style="width:110px;text-align:right;">Precio unit.</th>
+                <th style="width:90px;text-align:right;">Descuento</th>
+                <th style="width:110px;text-align:right;">Subtotal</th>
+                <th style="width:70px;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="td-name">Equipo split inverter 12000 BTU</div>
+                  <div class="td-sub">Danfoss · Copeland</div>
+                </td>
+                <td style="text-align:right;color:var(--gray-600);">1</td>
+                <td style="text-align:right;color:var(--gray-600);">U$S 2.800</td>
+                <td style="text-align:right;color:var(--gray-600);">—</td>
+                <td style="text-align:right;font-weight:600;color:var(--gray-900);">U$S 2.800</td>
+                <td>
+                  <div class="row-act">
+                    <button class="btn-icon" title="Editar" onclick="openModal('modalLinea')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="btn-icon danger" title="Eliminar"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="td-name">Kit instalación split estándar</div>
+                  <div class="td-sub">Danfoss · Copeland</div>
+                </td>
+                <td style="text-align:right;color:var(--gray-600);">1</td>
+                <td style="text-align:right;color:var(--gray-600);">U$S 750</td>
+                <td style="text-align:right;color:var(--gray-600);">10%</td>
+                <td style="text-align:right;font-weight:600;color:var(--gray-900);">U$S 675</td>
+                <td>
+                  <div class="row-act">
+                    <button class="btn-icon" title="Editar" onclick="openModal('modalLinea')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="btn-icon danger" title="Eliminar"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="total-row">
+            <span class="total-label">Total de líneas</span>
+            <span class="total-amount">U$S 3.475</span>
+          </div>
+        </div>
+
+        <!-- TAB: SERVICIOS (RF55) -->
+        <div class="tab-content" id="tab-servicios">
+          <div class="tab-toolbar">
+            <h4>1 servicio registrado</h4>
+            <button class="btn-secondary" style="height:32px;font-size:12px;" onclick="openModal('modalServicio')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Agregar servicio
+            </button>
+          </div>
+          <table class="inner-table">
+            <thead>
+              <tr>
+                <th>Servicio</th>
+                <th>Empleado</th>
+                <th>Fecha pactada</th>
+                <th>Estado</th>
+                <th style="width:70px;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="td-name">Instalación split</div>
+                  <div class="td-sub">U$S 200 · sin descuento</div>
+                </td>
+                <td style="color:var(--gray-600);">Nicolás G.</td>
+                <td style="color:var(--gray-600);">22/03/2026</td>
+                <td><span class="svc-badge svc-finalizado">Finalizado</span></td>
+                <td>
+                  <div class="row-act">
+                    <button class="btn-icon" title="Editar" onclick="openModal('modalServicio')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TAB: NOTAS (RF56) -->
+        <div class="tab-content" id="tab-notas">
+          <div class="notas-list">
+            <div class="nota-item">
+              <div class="nota-meta"><strong>Cristian García</strong> · 28/03/2026 14:32</div>
+              <div class="nota-text">Pago confirmado por transferencia. Factura enviada por correo al cliente.</div>
+            </div>
+            <div class="nota-item">
+              <div class="nota-meta"><strong>Nicolás García</strong> · 22/03/2026 11:15</div>
+              <div class="nota-text">Instalación completada sin inconvenientes. Cliente conforme con el resultado. Se dejó manual de uso en el local.</div>
+            </div>
+            <div class="nota-item">
+              <div class="nota-meta"><strong>Cristian García</strong> · 10/03/2026 09:40</div>
+              <div class="nota-text">Equipo recibido del proveedor. Verificado en buen estado. Se coordina entrega para la semana que viene.</div>
+            </div>
+          </div>
+          <div class="nota-add">
+            <textarea class="nota-textarea" placeholder="Escribí una nota de seguimiento..."></textarea>
+            <button class="btn-primary" style="height:36px;align-self:flex-end;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Agregar
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /tabs -->
+    </div><!-- /layout -->
+
+  </div><!-- /page -->
+</div><!-- /main -->
+
+<!-- ── MODAL: AVANZAR ESTADO ── -->
+<div class="modal-overlay" id="modalEstado">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Avanzar estado del proceso</h3>
+      <button class="modal-close" onclick="closeModal('modalEstado')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:4px;">Estado actual: <strong style="color:var(--gray-700);">Facturado</strong></p>
+      <div class="estado-steps">
+        <label class="estado-option">
+          <input type="radio" name="nuevoEstado" value="CERRADO" checked>
+          <div>
+            <div class="estado-option-label">Cerrado</div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:2px;">El proceso se cierra con éxito. No podrá modificarse.</div>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalEstado')">Cancelar</button>
+      <button class="btn-primary">Confirmar avance</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: MARCAR PERDIDA ── -->
+<div class="modal-overlay" id="modalPerdida">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Marcar proceso como perdida</h3>
+      <button class="modal-close" onclick="closeModal('modalPerdida')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--gray-500);line-height:1.6;">Esta acción marcará el proceso <strong style="color:var(--gray-700);">PV-007</strong> como perdida. El proceso quedará en modo solo lectura y no podrá modificarse.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalPerdida')">Cancelar</button>
+      <button class="btn-danger" style="border:none;background:#dc2626;color:white;">Confirmar perdida</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: EDITAR DATOS GENERALES ── -->
+<div class="modal-overlay" id="modalGenerales">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Editar datos generales</h3>
+      <button class="modal-close" onclick="closeModal('modalGenerales')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Empresa cliente</label>
+        <select class="form-select"><option>Farmacia Central</option><option>Supermercado El Dorado</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contacto principal</label>
+        <select class="form-select"><option>María López</option><option>Carlos Pérez</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Empleado responsable</label>
+        <select class="form-select"><option>Cristian García</option><option>Nicolás García</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-textarea">Equipo split inverter 12000 BTU para sala de medicamentos refrigerados.</textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalGenerales')">Cancelar</button>
+      <button class="btn-primary">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: DATOS COMERCIALES ── -->
+<div class="modal-overlay" id="modalComercial">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Datos comerciales</h3>
+      <button class="modal-close" onclick="closeModal('modalComercial')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Monto de venta final</label>
+        <input type="number" class="form-input" value="3480" placeholder="0.00">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha entrega prometida</label>
+          <input type="date" class="form-input" value="2026-03-20">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha entrega real</label>
+          <input type="date" class="form-input" value="2026-03-22">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalComercial')">Cancelar</button>
+      <button class="btn-primary">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: FACTURACIÓN ── -->
+<div class="modal-overlay" id="modalFacturacion">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Datos de facturación</h3>
+      <button class="modal-close" onclick="closeModal('modalFacturacion')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Número de factura</label>
+        <input type="text" class="form-input" value="A 0001-00004821">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha de pago</label>
+        <input type="date" class="form-input" value="2026-03-28">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalFacturacion')">Cancelar</button>
+      <button class="btn-primary">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: AGREGAR / EDITAR LÍNEA ── -->
+<div class="modal-overlay" id="modalLinea">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Línea de producto</h3>
+      <button class="modal-close" onclick="closeModal('modalLinea')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Producto</label>
+        <select class="form-select"><option>Equipo split inverter 12000 BTU</option><option>Kit instalación split estándar</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Proveedor</label>
+        <select class="form-select"><option>Copeland — U$S 2.100 · 15 días</option><option>Danfoss — U$S 2.250 · 10 días</option></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Cantidad</label>
+          <input type="number" class="form-input" value="1" min="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Precio unitario</label>
+          <input type="number" class="form-input" value="2800">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descuento (opcional, 0–1)</label>
+        <input type="number" class="form-input" placeholder="Ej: 0.10 para 10%" min="0" max="1" step="0.01">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalLinea')">Cancelar</button>
+      <button class="btn-primary">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: AGREGAR / EDITAR SERVICIO ── -->
+<div class="modal-overlay" id="modalServicio">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Servicio</h3>
+      <button class="modal-close" onclick="closeModal('modalServicio')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Servicio</label>
+        <select class="form-select"><option>Instalación split</option><option>Mantenimiento preventivo</option><option>Diagnóstico técnico</option></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Precio</label>
+          <input type="number" class="form-input" value="200">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descuento (opcional)</label>
+          <input type="number" class="form-input" placeholder="0.00" min="0" max="1" step="0.01">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Empleado asignado</label>
+        <select class="form-select"><option>Nicolás García</option><option>Cristian García</option></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha pactada</label>
+          <input type="date" class="form-input" value="2026-03-22">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha realizada</label>
+          <input type="date" class="form-input" value="2026-03-22">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Estado</label>
+        <select class="form-select"><option>Pendiente</option><option>En curso</option><option selected>Finalizado</option><option>Cancelado</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-textarea" placeholder="Detalles del servicio...">Instalación del equipo split en sala de medicamentos. Cliente presente durante el proceso.</textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalServicio')">Cancelar</button>
+      <button class="btn-primary">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: VER COTIZACIÓN ── -->
+<div class="modal-overlay" id="modalCotiz">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <h3>Vista previa — Cotización PV-007</h3>
+      <button class="modal-close" onclick="closeModal('modalCotiz')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" style="gap:8px;">
+      <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:16px;">
+        <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--gray-200);">
+          <div style="font-size:12px;color:var(--gray-400);margin-bottom:2px;">Cliente</div>
+          <div style="font-size:13px;font-weight:600;color:var(--gray-900);">Farmacia Central</div>
+          <div style="font-size:12px;color:var(--gray-500);">Contacto: María López</div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead><tr>
+            <th style="text-align:left;padding:6px 0;color:var(--gray-400);font-weight:600;text-transform:uppercase;font-size:10px;border-bottom:1px solid var(--gray-200);">Producto</th>
+            <th style="text-align:right;padding:6px 0;color:var(--gray-400);font-weight:600;text-transform:uppercase;font-size:10px;border-bottom:1px solid var(--gray-200);">Cant.</th>
+            <th style="text-align:right;padding:6px 0;color:var(--gray-400);font-weight:600;text-transform:uppercase;font-size:10px;border-bottom:1px solid var(--gray-200);">P. Unit.</th>
+            <th style="text-align:right;padding:6px 0;color:var(--gray-400);font-weight:600;text-transform:uppercase;font-size:10px;border-bottom:1px solid var(--gray-200);">Total</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td style="padding:8px 0;color:var(--gray-700);">Equipo split inverter 12000 BTU</td>
+              <td style="text-align:right;padding:8px 0;color:var(--gray-600);">1</td>
+              <td style="text-align:right;padding:8px 0;color:var(--gray-600);">U$S 2.800</td>
+              <td style="text-align:right;padding:8px 0;font-weight:600;color:var(--gray-900);">U$S 2.800</td>
+            </tr>
+            <tr>
+              <td style="padding:8px 0;color:var(--gray-700);">Kit instalación split estándar <span style="color:var(--gray-400);font-size:11px;">(−10%)</span></td>
+              <td style="text-align:right;padding:8px 0;color:var(--gray-600);">1</td>
+              <td style="text-align:right;padding:8px 0;color:var(--gray-600);">U$S 750</td>
+              <td style="text-align:right;padding:8px 0;font-weight:600;color:var(--gray-900);">U$S 675</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="text-align:right;padding-top:12px;border-top:1px solid var(--gray-200);color:var(--gray-500);font-weight:600;">Total</td>
+              <td style="text-align:right;padding-top:12px;border-top:1px solid var(--gray-200);font-weight:700;font-size:14px;color:var(--gray-900);">U$S 3.475</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div style="margin-top:12px;font-size:11px;color:var(--gray-400);font-style:italic;">Los precios no incluyen impuestos. Vigencia de cotización: 15 días.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modalCotiz')">Cerrar</button>
+      <button class="btn-primary">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+function openModal(id)  { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
+});
+</script>
+</body>
+</html>
