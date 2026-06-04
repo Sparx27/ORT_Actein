@@ -2,20 +2,21 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from app.middlewares.auth_stub import AuthStubMiddleware 
-
+from app.auth.auth_middleware import AuthMiddleware 
+from app.router.rou_login import login_router
 app = FastAPI()
+
+app.include_router(login_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=['*'],
     allow_credentials=True,
-    allow_methods=["*"],     
-    allow_headers=["*"],
+    allow_methods=['*'],     
+    allow_headers=['*'],
 )
 
-app.add_middleware(AuthStubMiddleware)
+app.add_middleware(AuthMiddleware)
 
 @app.get('/')
 def home():
