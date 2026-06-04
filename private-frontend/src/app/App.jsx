@@ -4,6 +4,7 @@ import Providers from './Providers'
 import AuthLayout from '../layouts/AuthLayout'
 import LoginPage from '../features/auth/LoginPage'
 import '../shared/styles/index.css'
+import '../shared/styles/layout.css'
 
 function App() {
 
@@ -16,7 +17,7 @@ function App() {
         </Route>
 
         <Route path="/" element={<MainLayout />}>
-          <Route index element={<h1>Index</h1>} />
+          <Route index element={<h1 className="h1">Index</h1>} />
         </Route>
 
       </Routes>

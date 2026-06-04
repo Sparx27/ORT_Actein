@@ -1,5 +1,5 @@
 const Container = ({ children }) => {
-  return <section className="container">{children}</section>
+  return <div className="container">{children}</div>
 }
 
 export default Container

@@ -21,6 +21,9 @@
   --gray-900: #0f172a;
   --white: #FFF;
   --default-bg: #eef0f3;
+  --nav-active-bg: rgba(14, 116, 144, 0.35);
+  --nav-active-icon: #38bdf8;
+  --line-separation: rgba(255, 255, 255, 0.07);
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -117,7 +120,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-main);
+  font-family: var(--font-head);
 }
 
 ul,
@@ -127,7 +130,7 @@ ol {
 
 .h1 {
   font-family: var(--font-head);
-  font-size: clamp(20px, 3vw, 26px);
+  font-size: clamp(22px, 3vw, 26px);
   font-weight: 700;
   color: var(--gray-900);
   line-height: 1.2;
@@ -136,20 +139,18 @@ ol {
 
 .h2 {
   font-family: var(--font-head);
-  font-size: clamp(16px, 2.2vw, 20px);
+  font-size: clamp(17px, 2.2vw, 20px);
   font-weight: 600;
   color: var(--gray-900);
-  letter-spacing: 0.06em;
   line-height: 1.3;
   margin-bottom: 4px;
 }
 
 .h3 {
   font-family: var(--font-head);
-  font-size: clamp(14px, 1.6vw, 17px);
+  font-size: clamp(15px, 1.6vw, 17px);
   font-weight: 600;
   color: var(--gray-700);
-  letter-spacing: 0.04em;
   line-height: 1.4;
   margin-bottom: 4px;
 }
@@ -420,12 +421,17 @@ ol {
   color: var(--gray-900);
 }
 
+.btn-bigPadding {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
 /** Breadcrumb **/
 
 .breadcrumb-bar {
-  height: 44px;
+  height: 59px;
   background: var(--white);
-  border-bottom: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-600);
 }
 
 .breadcrumb-inner {
@@ -472,7 +478,40 @@ ol {
   flex-shrink: 0;
 }
 
-/** INPUTS **/
+/** FORM, INPUTS **/
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.form-head {
+  margin-bottom: 20px;
+}
+
+.form-head p {
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--gray-500);
+}
+
+.form button[type='submit'] {
+  margin-top: 6px;
+}
+
+@media (max-width:768px) {
+  .form-head {
+    margin-bottom: 10px;
+  }
+
+  .form-head p {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--gray-500);
+  }
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -480,9 +519,10 @@ ol {
 }
 
 .field-label {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--gray-700);
+  letter-spacing: .4px;
 }
 
 .input-wrap {
@@ -513,7 +553,6 @@ ol {
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 
-/* Cuando tiene ícono, se empuja el texto para que no se monte */
 .input-wrap.has-icon input {
   padding-left: 40px;
 }
@@ -532,4 +571,21 @@ ol {
   background: var(--gray-100);
   color: var(--gray-400);
   cursor: not-allowed;
+}
+
+/* Estado de error */
+.input-wrap.has-error input {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.input-wrap.has-error input:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.field-error {
+  font-size: 12px;
+  font-weight: 500;
+  color: #991b1b;
 }

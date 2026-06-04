@@ -52,9 +52,9 @@ function Modal({ isOpen, onClose, children }) {
       ref={overlayRef}
       onClick={handleOverlayClick}
     >
-      <div className="modal-box">
+      <dialog className="modal-box">
         {children}
-      </div>
+      </dialog>
     </div>
   )
 }
