@@ -5,7 +5,7 @@ from datetime import datetime
 
 class CategoryProduct(Base):
   __tablename__= 'product_category'
-  __table_args__= {'schema': 'public'}
+  __table_args__= {'schema': 'private'}
 
   id: Mapped[int] = mapped_column(primary_key=True)
   name: Mapped[str] = mapped_column(String(255))
