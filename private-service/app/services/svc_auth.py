@@ -15,7 +15,7 @@ def svc_login(db: Session, email : str, password: str):
     _verify_active(app_user)
 
     token = create_token({'id':app_user.id, 'email': app_user.email, 'role': app_user.role})
-    return token
+    return {'access_token': token, 'token_type': 'bearer'}
 
 
 
