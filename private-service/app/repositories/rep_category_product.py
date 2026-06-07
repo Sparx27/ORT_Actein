@@ -1,12 +1,26 @@
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.orm import Session
 from app.models.mod_category_product import CategoryProduct
 
-def rep_get_categories(db: Session):
+def _build_search_filter(search: str | None) -> list:
+    if not search:
+        return []
+    clean_search = search.strip().lower()
+    return [
+        or_(
+            CategoryProduct.name.ilike(f'%{clean_search}%'),
+            CategoryProduct.description.ilike(f'%{clean_search}%')
+        )
+    ]
+
+def rep_get_categories(db: Session, search: str | None, limit: int, offset: int):
+  filters_ = _build_search_filter(search)
   query = (
     select(CategoryProduct)
-    .where(CategoryProduct.is_active == True)
+    .where(CategoryProduct.is_active == True, *filters_)
     .order_by(CategoryProduct.name)
+    .limit(limit)
+    .offset(offset)
   )
   return db.execute(query).scalars().all()
 

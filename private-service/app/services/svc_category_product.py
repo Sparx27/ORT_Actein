@@ -3,9 +3,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 from app.repositories.rep_category_product import rep_get_categories, rep_get_category_by_name, rep_create_category
 
-def svc_get_categories(db: Session):
+LIMIT = 12
+
+def svc_get_categories(db: Session, page: int, search: str | None):
     try:
-        return rep_get_categories(db)
+        offset = (page - 1) * LIMIT
+        return rep_get_categories(db, search, LIMIT, offset)
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail='Error al obtener las categorías')
     

@@ -35,7 +35,8 @@ def _build_filters(
 def rep_get_products(
     db: Session, 
     search: str | None, 
-    limit: int, offset: int, 
+    limit: int, 
+    offset: int, 
     category_id: int | None, 
     brand: str | None,
     requires_installation: bool | None
