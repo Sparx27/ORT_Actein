@@ -13,3 +13,9 @@ class SchCategoryProductRequest(BaseModel):
 
     name: str
     description: str | None
+
+class SchCategoryPaginated(BaseModel):
+    total_categories : int
+    page : int
+    total_pages : int
+    categories : list[SchCategoryProduct]

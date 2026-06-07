@@ -5,6 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from app.auth.auth_middleware import AuthMiddleware 
 from app.router.rou_login import login_router
 from app.router.rou_category_product import category_router
+
 app = FastAPI()
 
 app.include_router(login_router)
