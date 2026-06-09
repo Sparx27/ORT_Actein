@@ -23,7 +23,7 @@ const MainLayout = () => {
       <Sidebar open={open} />
       <SidebarOverlay open={open} onClose={closeSidebar} />
 
-      <main className="main-layout main-layout-padding">
+      <main className="main-layout">
         <Outlet />
       </main>
       <BottomNav tabs={bottomTabs} onMore={toggleSidebar} />
