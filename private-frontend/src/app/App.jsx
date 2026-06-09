@@ -4,7 +4,12 @@ import Providers from './Providers'
 import AuthLayout from '../layouts/AuthLayout'
 import LoginPage from '../features/auth/LoginPage'
 import '../shared/styles/index.css'
-import '../shared/styles/layout.css'
+import '../layouts/styles/layout.css'
+import '../shared/styles/data_related.css'
+import ProductCategoryPage from '../features/product_category/ProductCategoryPage'
+import NotFound from './NotFound'
+import ProductPage from '../features/product/ProductPage'
+import TextPage from './TextPage'
 
 function App() {
 
@@ -12,12 +17,17 @@ function App() {
     <Providers>
       <Routes>
 
+        <Route path="/test" element={<TextPage />} />
+
         <Route element={<AuthLayout />}>
           <Route path="/ingresar" element={<LoginPage />} />
         </Route>
 
         <Route path="/" element={<MainLayout />}>
           <Route index element={<h1 className="h1">Index</h1>} />
+          <Route path="/categorias" element={<ProductCategoryPage />} />
+          <Route path="/productos" element={<ProductPage />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
 
       </Routes>

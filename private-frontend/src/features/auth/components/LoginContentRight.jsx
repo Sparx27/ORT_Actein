@@ -7,10 +7,6 @@ import SvgPassword from '../../../shared/components/svgs/SvgPassword'
 import Button from '../../../shared/components/Button'
 
 const LoginContentRight = () => {
-  // RHF nos da tres cosas:
-  // - register: para conectar cada input al form
-  // - handleSubmit: wrapper que valida antes de llamar a nuestra función
-  // - errors: objeto con los errores de validación de cada campo
   const { register, handleSubmit, formState: { errors } } = useForm()
 
   // Feedback general del form (respuesta del servidor)
@@ -26,8 +22,8 @@ const LoginContentRight = () => {
     console.log('Login con:', data)
 
     // si el backend rechaza las credenciales:
-    // setFeedback('Email o contraseña incorrectos.')
-    // setFeedbackType('error')
+    // setApiRes('Email o contraseña incorrectos.')
+    // setApiResType('error')
   }
   return (
     <section className="login-right-container">
@@ -54,6 +50,7 @@ const LoginContentRight = () => {
             autoComplete="username"
             error={errors.email?.message}
             icon={<SvgEmail />}
+            extraClass={'input-login'}
           />
 
           <Input
@@ -68,12 +65,13 @@ const LoginContentRight = () => {
             autoComplete="current-password"
             error={errors.password?.message}
             icon={<SvgPassword />}
+            extraClass={'input-login'}
           />
 
-          <Button type="submit" bigPadding>Iniciar sesión</Button>
+          <Button type="submit" bigPadding extraClass={'fs-14'}>Iniciar sesión</Button>
         </CForm>
 
-        <div className="brand-footer-right">© 2026 Actein</div>
+        <div className="brand-footer-right">© Actein</div>
       </div>
     </section>
   )

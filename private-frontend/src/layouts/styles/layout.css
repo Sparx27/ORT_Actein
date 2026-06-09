@@ -1,3 +1,7 @@
+.main-layout {
+  background: var(--gray-50);
+}
+
 .main-layout-grid {
   display: grid;
   grid-template-columns: 230px 1fr;
@@ -36,6 +40,7 @@
   align-items: center;
   padding: 14px 12px 13px;
   border-bottom: 1px solid var(--line-separation);
+  margin-bottom: 8px;
 }
 
 .sidebar-brand .brand-container {
@@ -224,6 +229,13 @@
 
 /** OUTLET LAYOUT **/
 
-.main-layout-padding {
-  padding: 22px 25px;
+.main-content-display {
+  padding: 35px 30px;
+
+}
+
+@media (max-width: 768px) {
+  .main-content-display {
+    padding: 35px var(--adaptable-px);
+  }
 }
