@@ -21,5 +21,4 @@ class AuthMiddleware(BaseHTTPMiddleware):
             request.state.user = payload
             return await call_next(request)
         except HTTPException:
-            raise
-        
+            return JSONResponse(status_code=401, content={'detail' : 'Token inválido'})

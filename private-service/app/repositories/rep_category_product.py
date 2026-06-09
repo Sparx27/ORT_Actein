@@ -39,17 +39,11 @@ def rep_count_categories(
     )
     return db.execute(query).scalar()
 
-def rep_get_category_by_name(db: Session, category_name: str):
+def rep_get_category_by_name(db: Session, category_name: str, exclude_id: int | None = None):
+  filter_id = [] if exclude_id is None else [CategoryProduct.id != exclude_id]
   query = (
     select(CategoryProduct)
-    .where(CategoryProduct.name == category_name)
-  )
-  return db.execute(query).scalars().first()
-
-def rep_get_category_by_name_excluding_id(db, category_name, exclude_id):
-  query = (
-    select(CategoryProduct)
-    .where(CategoryProduct.name == category_name, CategoryProduct.id != exclude_id)
+    .where(CategoryProduct.name == category_name,*filter_id)
   )
   return db.execute(query).scalars().first()
 

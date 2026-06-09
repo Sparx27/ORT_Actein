@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 class SchCategoryProduct(BaseModel):
     model_config= ConfigDict(from_attributes=True)
@@ -9,13 +9,13 @@ class SchCategoryProduct(BaseModel):
     is_active: bool 
 
 class SchCategoryProductRequest(BaseModel):
-    model_config= ConfigDict(from_attributes=True)
+    model_config= ConfigDict(from_attributes=True, str_strip_whitespace=True)
 
-    name: str
-    description: str | None
+    name: str = Field(min_length=1, max_length=255)
+    description: str | None = Field(default=None, min_length=1, max_length=1000)
 
 class SchCategoryPaginated(BaseModel):
-    total_categories : int
+    total : int
     page : int
     total_pages : int
     categories : list[SchCategoryProduct]
