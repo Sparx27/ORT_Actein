@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from app.schemas.sch_category import SchCategory
+from app.schemas.sch_category_product import SchCategory
 
 class SchProductList(BaseModel):
     model_config = ConfigDict(from_attributes=True)

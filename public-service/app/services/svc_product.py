@@ -12,11 +12,11 @@ import math
 
 LIMIT = 12
 
-def svc_get_products(db: Session, page: int, search: str | None, category_id: int | None, brand: str | None):
+def svc_get_products(db: Session, page: int, search: str | None, category_id: int | None, brand: str | None, requires_installation: bool | None):
     try:
         offset = (page - 1) * LIMIT
-        products = rep_get_products(db,search, LIMIT, offset, category_id, brand)
-        total_products = rep_count_products(db, search, category_id, brand)
+        products = rep_get_products(db,search, LIMIT, offset, category_id, brand, requires_installation)
+        total_products = rep_count_products(db, search, category_id, brand, requires_installation)
         total_pages = math.ceil(total_products/LIMIT) if total_products > 0 else 1
         categories = rep_get_categories_with_products(db, search)
         brands = [row.brand for row in rep_get_brands(db, search)]
