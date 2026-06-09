@@ -11,7 +11,7 @@ export const publicService = axios.create({
 publicService.interceptors.response.use(
   (res) => res,
   (error) => {
-    const message = error.response?.data?.detail ?? 'Error de conexión, por favor inte nuevamente más tarde'
+    const message = error.response?.data?.detail ?? 'Error de conexión, por favor intente nuevamente más tarde'
     return Promise.reject(new Error(message))
   }
 )
