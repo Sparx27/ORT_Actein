@@ -19,25 +19,29 @@ def _build_search_filter(search: str | None) -> list:
 def _build_filters(
     search: str | None,
     category_id: int | None,
-    brand: str | None
+    brand: str | None,
+    requires_installation: bool | None
 )-> list:
     filters = _build_search_filter(search)
     if category_id:
         filters.append(Product.category_id == category_id)
     if brand:
         filters.append(Product.brand.ilike(brand))
-
+    if requires_installation is not None:
+        filters.append(Product.requires_installation == requires_installation)
     return filters
     
 
 def rep_get_products(
     db: Session, 
     search: str | None, 
-    limit: int, offset: int, 
+    limit: int, 
+    offset: int, 
     category_id: int | None, 
-    brand: str | None
+    brand: str | None,
+    requires_installation: bool | None
 ):
-    filters_ =_build_filters(search, category_id, brand)
+    filters_ =_build_filters(search, category_id, brand, requires_installation)
     query = (
         select(
             Product.id,
@@ -57,9 +61,10 @@ def rep_count_products(
         db: Session, 
         search: str | None,
         category_id: int | None,
-        brand: str | None
+        brand: str | None,
+        requires_installation: bool | None
 ) -> int:
-    filters_ =_build_filters(search, category_id, brand)
+    filters_ =_build_filters(search, category_id, brand, requires_installation)
 
     query = (
         select(func.count())

@@ -12,9 +12,10 @@ def get_products(
     page: int = Query(default=1, ge=1),
     search: str | None = Query(default=None),
     category_id : int | None = Query(default=None),
-    brand: str | None = Query(default=None)
+    brand: str | None = Query(default=None),
+    requires_installation: bool | None = Query(default=None)
 ):
-    return svc_get_products(db, page, search, category_id, brand)
+    return svc_get_products(db, page, search, category_id, brand, requires_installation)
 
 @product_router.get('/products/{product_id}', response_model=SchProductDetail)
 def get_product(
