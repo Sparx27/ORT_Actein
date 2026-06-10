@@ -47,6 +47,7 @@ def rep_get_products(
             Product.id,
             Product.name,
             Product.brand,
+            CategoryProduct.id.label('category_id'),
             CategoryProduct.name.label('category_name')
         )
         .join(CategoryProduct, Product.category_id == CategoryProduct.id, isouter=True)

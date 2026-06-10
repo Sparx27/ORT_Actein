@@ -6,6 +6,7 @@ class SchProductList(BaseModel):
 
     id: int
     name: str
+    category_id: int | None = None
     category_name: str | None = None
     brand: str
 
