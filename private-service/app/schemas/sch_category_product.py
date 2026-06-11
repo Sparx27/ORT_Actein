@@ -19,3 +19,8 @@ class SchCategoryPaginated(BaseModel):
     page : int
     total_pages : int
     categories : list[SchCategoryProduct]
+
+class SchCategory(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    name: str
