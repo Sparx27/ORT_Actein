@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.config.database import get_db
 from app.auth.auth_scheme import security
-from app.schemas.sch_product import SchProductPaginated
-from app.services.svc_product import svc_get_products
+from app.schemas.sch_product import SchProductPaginated,SchProductCreate, SchProduct
+from app.services.svc_product import svc_get_products, svc_create_product
 
 product_router = APIRouter(dependencies=[Depends(security)])
 
@@ -17,3 +17,17 @@ def get_products(
     is_active: bool | None = Query(default=None)
 ):
     return svc_get_products(db, page, search, category_id, brand, is_active)
+
+@product_router.post('/products', response_model=SchProduct, status_code=201)
+def create_product(data: SchProductCreate, db: Session = Depends(get_db)):
+  return svc_create_product(
+    db,
+    data.sku,
+    data.name,
+    data.description,
+    data.category_id,
+    data.brand,
+    data.specifications,
+    data.requires_installation,
+    data.maintenance_time
+)

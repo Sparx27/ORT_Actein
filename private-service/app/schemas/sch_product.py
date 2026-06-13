@@ -1,5 +1,20 @@
 from pydantic import BaseModel, ConfigDict, Field
 
+class SchProduct(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    sku: str | None
+    name: str 
+    description: str | None 
+    category_id: int | None 
+    brand: str 
+    specifications: str | None 
+    requires_installation: bool | None 
+    maintenance_time: int | None 
+    is_active: bool 
+
+
 class SchProductList(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

@@ -85,29 +85,40 @@ def rep_get_product_by_id(db:Session, product_id:int):
             Product.requires_installation
         )
         .join(CategoryProduct, Product.category_id == CategoryProduct.id, isouter=True)
-        .where(_IS_ACTIVE, Product.id == product_id)
+        .where(Product.id == product_id)
     )
     return db.execute(query).first()
     
+def rep_get_product_by_sku(db: Session, sku: str, exclude_id: int | None = None):
+  filter_id = [] if exclude_id is None else [Product.id != exclude_id]
+  query = (
+    select(Product)
+    .where(Product.sku == sku,*filter_id)
+  )
+  return db.execute(query).scalars().first()
 
-def rep_get_categories_with_products(db: Session, search: str | None):
-    filters = _build_search_filter(search)
-    query = (
-        select(CategoryProduct.id, CategoryProduct.name)
-        .join(Product, Product.category_id == CategoryProduct.id)
-        .where(CategoryProduct.is_active == True, _IS_ACTIVE, *filters)
-        .order_by(CategoryProduct.name)
-        .distinct()
-    )
-    return db.execute(query).all()
-
-
-def rep_get_brands(db: Session, search: str | None):
-    filters = _build_search_filter(search)
-    query = (
-        select(Product.brand)
-        .where(_IS_ACTIVE, *filters)
-        .order_by(Product.brand)
-        .distinct()
-    )
-    return db.execute(query).all()
+def rep_create_product(
+    db: Session,
+    sku: str | None,
+    name: str, 
+    description: str | None,
+    category_id: int | None,
+    brand: str,
+    specifications: str | None,
+    requires_installation: bool | None,
+    maintenance_time: int | None
+):
+  new_product = Product(
+      sku = sku,
+      name = name,
+      description = description,
+      category_id = category_id,
+      brand = brand,
+      specifications = specifications,
+      requires_installation = requires_installation,
+      maintenance_time = maintenance_time
+      )
+  db.add(new_product)
+  db.commit()
+  db.refresh(new_product)
+  return new_product
