@@ -31,7 +31,7 @@ class SchProductPaginated(BaseModel):
     total_pages : int
     products : list[SchProductList]
 
-class SchProductCreate(BaseModel):
+class SchProductRequest(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
     sku: str | None = Field(max_length=255, default=None)

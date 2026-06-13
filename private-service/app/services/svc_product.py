@@ -6,11 +6,13 @@ from app.repositories.rep_product import (
     rep_count_products, 
     rep_get_product_by_id,
     rep_get_product_by_sku,
-    rep_create_product
+    rep_create_product,
+    rep_modify_product
 )
 from app.repositories.rep_category_product import rep_get_category_by_id
 from app.shared.utl_validators import validate_exists
 from app.shared.utl_pagination import build_pagination
+from app.schemas.sch_product import SchProductRequest
 
 LIMIT = 12
 
@@ -52,15 +54,26 @@ def svc_create_product(
         raise HTTPException(status_code=500, detail='Error al procesar el registro')
     
 
-
-def svc_get_product_by_id(db:Session, product_id: int):
+def svc_modify_product(
+    db: Session,
+    product_id:int,
+    product_modify:SchProductRequest
+):
     try:
-        product = rep_get_product_by_id(db, product_id)
-        if product is None:
-            raise HTTPException(status_code=404, detail= 'Producto no encontrado')
-        return product
+        if product_modify.category_id is not None:
+            validate_exists(rep_get_category_by_id(db, product_modify.category_id), 'Categoría')
+        product = svc_get_product_by_id(db,product_id)
+        if product_modify.sku is not None:
+            _validate_unique_sku(db,product_modify.sku,product_id)        
+        product_dict = product_modify.model_dump()
+        return rep_modify_product(db, product, product_dict)
     except SQLAlchemyError:
-        raise HTTPException(status_code=500, detail='Error al obtener el producto')
+        raise HTTPException(status_code=500, detail='Error al modificar el producto')
+
+
+def svc_get_product_by_id(db: Session, product_id: int):
+    product = rep_get_product_by_id(db, product_id)
+    return validate_exists(product, 'Producto')
     
 
 def _validate_unique_sku(db: Session, sku: str, id: int | None = None):

@@ -72,22 +72,12 @@ def rep_count_products(
     )
     return db.execute(query).scalar()
 
-def rep_get_product_by_id(db:Session, product_id:int):
+def rep_get_product_by_id(db:Session, id:int):
     query = (
-        select(
-            Product.id,
-            Product.name,
-            Product.description,
-            Product.brand,
-            CategoryProduct.name.label('category_name'),
-            CategoryProduct.id.label('category_id'),
-            Product.specifications,
-            Product.requires_installation
-        )
-        .join(CategoryProduct, Product.category_id == CategoryProduct.id, isouter=True)
-        .where(Product.id == product_id)
+        select(Product)
+        .where(Product.id == id)
     )
-    return db.execute(query).first()
+    return db.execute(query).scalars().first()
     
 def rep_get_product_by_sku(db: Session, sku: str, exclude_id: int | None = None):
   filter_id = [] if exclude_id is None else [Product.id != exclude_id]
@@ -122,3 +112,34 @@ def rep_create_product(
   db.commit()
   db.refresh(new_product)
   return new_product
+
+""" def rep_modify_product(
+    db:Session,
+    product: Product,
+    sku: str | None,
+    name: str, 
+    description: str | None,
+    category_id: int | None,
+    brand: str,
+    specifications: str | None,
+    requires_installation: bool | None,
+    maintenance_time: int | None
+):
+    product.sku = sku
+    product.name = name
+    product.description = description
+    product.category_id = category_id
+    product.brand = brand
+    product.specifications = specifications
+    product.requires_installation = requires_installation
+    product.maintenance_time = maintenance_time
+    db.commit()
+    db.refresh(product)
+    return product """
+
+def rep_modify_product(db: Session, product: Product, fields: dict):
+    for field, value in fields.items():
+        setattr(product, field, value)
+    db.commit()
+    db.refresh(product)
+    return product

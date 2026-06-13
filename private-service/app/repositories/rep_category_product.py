@@ -61,12 +61,12 @@ def rep_get_category_by_id(db: Session, id: int):
   )
   return db.execute(query).scalars().first()
 
-def rep_modify_category(db: Session, category_actual: CategoryProduct, category_name: str, category_description: str):
-   category_actual.name = category_name
-   category_actual.description = category_description
+def rep_modify_category(db: Session, category: CategoryProduct, category_name: str, category_description: str):
+   category.name = category_name
+   category.description = category_description
    db.commit()
-   db.refresh(category_actual)
-   return category_actual
+   db.refresh(category)
+   return category
 
 def rep_deactivate_category(db: Session, category: CategoryProduct):
    category.is_active = False
