@@ -11,6 +11,7 @@ import NotFound from './NotFound'
 import ProductPage from '../features/product/ProductPage'
 import TextPage from './TextPage'
 import HomePage from '../features/Home/HomePage'
+import ProtectedRoute from './ProtectedRoute'
 
 function App() {
 
@@ -23,13 +24,15 @@ function App() {
           <Route path="/ingresar" element={<LoginPage />} />
         </Route>
 
-        <Route path="/" element={<MainLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="/categorias" element={<ProductCategoryPage />} />
-          <Route path="/productos" element={<ProductPage />} />
-          <Route path="*" element={<NotFound />} />
+        <Route path="/" element={<ProtectedRoute />}>
+          <Route element={<MainLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="/categorias" element={<ProductCategoryPage />} />
+            <Route path="/productos" element={<ProductPage />} />
+          </Route>
         </Route>
 
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Providers>
   )
