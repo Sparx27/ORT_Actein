@@ -34,10 +34,10 @@ const EntityFilters = ({ controls = null, onSubmit }) => {
                 key={`control-${i}`}
                 icon={c.icon}
                 type="text"
-                id
+                id={c.name}
                 placeholder={c.placeholder}
                 disabled={false}
-                autoComplete
+                autoComplete="true"
                 error={false}
                 extraClass={'data-filters-input'}
               />

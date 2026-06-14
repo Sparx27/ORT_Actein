@@ -7,7 +7,7 @@ const Input = forwardRef(({
   id,
   placeholder,
   disabled,
-  autoComplete,
+  autoComplete = 'false',
   error,
   extraClass,
   ...rest   // para capturar name, onChange, onBlur que vienen de register()
