@@ -7,11 +7,11 @@ export const getCategories = async ({ page, search }) => {
     ...(search && { search })
   }
 
-  const { data } = await privateService.get('/product_categories', { params })
+  const { data } = await privateService.get('/categories', { params })
   return data
 }
 
 export const getCategory = async (id) => {
-  const { data } = await privateService.get(`/product_categories/${id}`)
+  const { data } = await privateService.get(`/categories/${id}`)
   return data
 }
