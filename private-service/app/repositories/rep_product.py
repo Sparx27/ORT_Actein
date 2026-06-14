@@ -1,4 +1,4 @@
-from sqlalchemy import func, or_, select
+from sqlalchemy import exists, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.models.mod_category_product import CategoryProduct
@@ -43,7 +43,7 @@ def rep_get_products(
         )
         .join(CategoryProduct, Product.category_id == CategoryProduct.id, isouter=True)
         .where(*filters_)
-        .order_by(Product.name)
+        .order_by(Product.id)
         .limit(limit)
         .offset(offset)
     )
@@ -82,3 +82,8 @@ def rep_modify_product(db: Session, product: Product, fields: dict):
     db.commit()
     db.refresh(product)
     return product
+
+
+def rep_exists_active_product_in_category(db: Session, category_id: int):
+    query = select(exists().where(Product.category_id == category_id, Product.is_active.is_(True)))
+    return db.execute(query).scalar()

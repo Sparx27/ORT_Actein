@@ -28,3 +28,7 @@ class SchCategory(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
+
+
+class SchCategoryStatusUpdate(BaseModel):
+    is_active: bool

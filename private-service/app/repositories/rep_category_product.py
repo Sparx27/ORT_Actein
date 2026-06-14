@@ -15,7 +15,7 @@ def _build_search_filter(search: str | None) -> list:
 
 def rep_get_categories(db: Session, search: str | None, limit: int, offset: int):
     filters_ = _build_search_filter(search)
-    query = select(CategoryProduct).where(_IS_ACTIVE, *filters_).order_by(CategoryProduct.name).limit(limit).offset(offset)
+    query = select(CategoryProduct).where(*filters_).order_by(CategoryProduct.id).limit(limit).offset(offset)
     return db.execute(query).scalars().all()
 
 
@@ -30,7 +30,7 @@ def rep_count_categories(
 ) -> int:
     filters_ = _build_search_filter(search)
 
-    query = select(func.count()).select_from(CategoryProduct).where(_IS_ACTIVE, *filters_)
+    query = select(func.count()).select_from(CategoryProduct).where(*filters_)
     return db.execute(query).scalar()
 
 
@@ -61,8 +61,8 @@ def rep_modify_category(db: Session, category: CategoryProduct, category_name: s
     return category
 
 
-def rep_deactivate_category(db: Session, category: CategoryProduct):
-    category.is_active = False
+def rep_update_category_status(db: Session, category: CategoryProduct, status: bool):
+    category.is_active = status
     db.commit()
     db.refresh(category)
     return category

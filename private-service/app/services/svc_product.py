@@ -61,6 +61,8 @@ def svc_get_product_by_id(db: Session, product_id: int):
 def svc_update_status(db: Session, product_id: int, product_status: SchProductStatusUpdate):
     try:
         product = svc_get_product_by_id(db, product_id)
+        if product.is_active == product_status.is_active:
+            raise HTTPException(status_code=422, detail='El producto ya se encuentra en ese estado')
         product_dict = product_status.model_dump()
         return rep_modify_product(db, product, product_dict)
     except SQLAlchemyError:
