@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getToken } from '../shared/auth/handleToken'
 export const VITE_URL_PRIVATE_SERVICE = import.meta.env.VITE_URL_PRIVATE_SERVICE
 
 // AUTH
@@ -16,8 +17,13 @@ authService.interceptors.response.use(
 
 // PRIVATE
 export const privateService = axios.create({
-  baseURL: VITE_URL_PRIVATE_SERVICE,
-  headers: {} //AGREGAR HEADER AUTH JWT
+  baseURL: VITE_URL_PRIVATE_SERVICE
+})
+
+privateService.interceptors.request.use((config) => {
+  const token = getToken()
+  config.headers.Authorization = `Bearer ${token}`
+  return config
 })
 
 privateService.interceptors.response.use(

@@ -100,10 +100,10 @@ const ProductCategoryPage = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deletingCategory, setDeletingCategory] = useState(null)
 
+  let apiData = categoriesQuery.data
+
   // IMPORTANTE: PASAR ESTE ISERROR AL ENTITY TABLE...
   //if (categoriesQuery.error) return <MessageBox message={categoriesQuery.error.message} type="error" />
-
-  const { categories, total_pages } = categoriesQuery.data
 
   const btnList = [
     {
@@ -140,9 +140,9 @@ const ProductCategoryPage = () => {
   ]
 
   const categoriesDataframe = entitiesToDataframe(
-    ['id', 'nombre', 'descripción'],
-    ['id', 'name', 'dsc'],
-    CATEGORIES,
+    ['id', 'nombre'],
+    ['id', 'name'],
+    apiData?.categories,
     btnList
   )
 
@@ -186,7 +186,7 @@ const ProductCategoryPage = () => {
           />
           <EntityPagination
             currentPage={page}
-            totalPages={categoriesQuery?.total_pages ?? 10}
+            totalPages={apiData?.total_pages}
             onPageChange={setPage}
           />
         </EntityPageContainer>

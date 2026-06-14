@@ -14,6 +14,8 @@ app.include_router(login_router)
 app.include_router(category_router)
 app.include_router(product_router)
 
+app.add_middleware(AuthMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -21,9 +23,6 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-
-app.add_middleware(AuthMiddleware)
-
 
 @app.get('/')
 def home():
