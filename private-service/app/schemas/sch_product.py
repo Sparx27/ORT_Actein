@@ -47,6 +47,10 @@ class SchProductRequest(BaseModel):
     maintenance_time: int | None = Field(gt=0, default=None)
 
 
+class SchProductStatusUpdate(BaseModel):
+    is_active: bool
+
+
 class SchProductDetail(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

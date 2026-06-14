@@ -11,7 +11,7 @@ from app.repositories.rep_product import (
     rep_get_products,
     rep_modify_product,
 )
-from app.schemas.sch_product import SchProductRequest
+from app.schemas.sch_product import SchProductRequest, SchProductStatusUpdate
 from app.shared.utl_pagination import build_pagination
 from app.shared.utl_validators import validate_exists
 
@@ -66,6 +66,15 @@ def svc_modify_product(db: Session, product_id: int, product_modify: SchProductR
 def svc_get_product_by_id(db: Session, product_id: int):
     product = rep_get_product_by_id(db, product_id)
     return validate_exists(product, 'Producto')
+
+
+def svc_update_status(db: Session, product_id: int, product_status: SchProductStatusUpdate):
+    try:
+        product = svc_get_product_by_id(db, product_id)
+        product_dict = product_status.model_dump()
+        return rep_modify_product(db, product, product_dict)
+    except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail='Error al modificar el estado')
 
 
 def _validate_unique_sku(db: Session, sku: str, id: int | None = None):
