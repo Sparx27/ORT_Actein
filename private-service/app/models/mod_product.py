@@ -1,12 +1,14 @@
-from app.config.database import Base
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, Text, ForeignKey, Boolean, Integer, DateTime
 from datetime import datetime
+
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.config.database import Base
 
 
 class Product(Base):
     __tablename__ = 'product'
-    __table_args__ = {'schema' : 'private'}
+    __table_args__ = {'schema': 'private'}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     sku: Mapped[str | None] = mapped_column(String(255))
