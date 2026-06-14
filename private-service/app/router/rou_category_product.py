@@ -20,6 +20,11 @@ def get_categories(db: Session = Depends(get_db), page: int = Query(default=1, g
     return svc_get_categories(db, page, search)
 
 
+@category_router.get('/categories/options', response_model=list[SchCategory])
+def get_categories_id_name(db: Session = Depends(get_db)):
+    return svc_get_categories_id_name(db)
+
+
 @category_router.post('/categories', response_model=SchCategoryProduct, status_code=201)
 def create_category(data: SchCategoryProductRequest, db: Session = Depends(get_db)):
     return svc_create_category(db, data.name, data.description)
@@ -33,8 +38,3 @@ def modify_category(data: SchCategoryProductRequest, id: int = Path(gt=0), db: S
 @category_router.patch('/categories/{id}/deactivate', response_model=SchCategoryProduct)
 def deactivate_category(id: int = Path(gt=0), db: Session = Depends(get_db)):
     return svc_deactivate_category(db, id)
-
-
-@category_router.get('/categories/options', response_model=list[SchCategory])
-def get_categories_id_name(db: Session = Depends(get_db)):
-    return svc_get_categories_id_name(db)

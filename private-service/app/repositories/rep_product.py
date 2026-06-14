@@ -68,27 +68,8 @@ def rep_get_product_by_sku(db: Session, sku: str, exclude_id: int | None = None)
     return db.execute(query).scalars().first()
 
 
-def rep_create_product(
-    db: Session,
-    sku: str | None,
-    name: str,
-    description: str | None,
-    category_id: int | None,
-    brand: str,
-    specifications: str | None,
-    requires_installation: bool | None,
-    maintenance_time: int | None,
-):
-    new_product = Product(
-        sku=sku,
-        name=name,
-        description=description,
-        category_id=category_id,
-        brand=brand,
-        specifications=specifications,
-        requires_installation=requires_installation,
-        maintenance_time=maintenance_time,
-    )
+def rep_create_product(db: Session, fields: dict):
+    new_product = Product(**fields)
     db.add(new_product)
     db.commit()
     db.refresh(new_product)

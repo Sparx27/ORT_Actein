@@ -23,17 +23,7 @@ def get_products(
 
 @product_router.post('/products', response_model=SchProduct, status_code=201)
 def create_product(data: SchProductRequest, db: Session = Depends(get_db)):
-    return svc_create_product(
-        db,
-        data.sku,
-        data.name,
-        data.description,
-        data.category_id,
-        data.brand,
-        data.specifications,
-        data.requires_installation,
-        data.maintenance_time,
-    )
+    return svc_create_product(db, data)
 
 
 @product_router.put('/products/{id}', response_model=SchProduct)

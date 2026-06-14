@@ -48,7 +48,7 @@ def svc_modify_category(db: Session, category_id: int, category_name: str, categ
 def svc_deactivate_category(db: Session, category_id: int):
     try:
         category = validate_exists(rep_get_category_by_id(db, category_id), 'Categoría')
-        if category.is_active.is_(False):
+        if category.is_active is False:
             raise HTTPException(status_code=422, detail='La categoría ya está inactiva')
         return rep_deactivate_category(db, category)
     except SQLAlchemyError:
