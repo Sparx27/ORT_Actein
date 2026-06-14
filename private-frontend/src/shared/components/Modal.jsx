@@ -59,10 +59,10 @@ function Modal({ isOpen, onClose, children }) {
   )
 }
 
-Modal.Header = function ModalHeader({ title, onClose, children }) {
+Modal.Header = function ModalHeader({ onClose, children }) {
   return (
     <div className="modal-header">
-      {children}
+      <div>{children}</div>
       {/* <span className="modal-title">{title}</span> */}
       <button className="btn-close" onClick={onClose} aria-label="Cerrar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"

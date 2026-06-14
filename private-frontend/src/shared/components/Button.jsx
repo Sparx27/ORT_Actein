@@ -1,3 +1,5 @@
+import SvgLoading from './svgs/SvgLoading'
+
 const Button = ({
   variant = 'primary',  // 'primary' | 'secondary' | 'ghost'
   full = false,
@@ -8,6 +10,7 @@ const Button = ({
   bigPadding = false,
   icon = null,
   hideTextOnMobile = false,
+  loading = false,
   extraClass,
   ...rest
 }) => {
@@ -21,9 +24,13 @@ const Button = ({
   ].filter(Boolean).join(' ')
 
   return (
-    <button className={classes} onClick={onClick} disabled={disabled} type={type} {...rest}>
-      {icon && icon}
-      <span className="btn-content">{children}</span>
+    <button className={classes} onClick={onClick} disabled={disabled || loading} type={type} {...rest}>
+      {loading ? <SvgLoading /> : (
+        <>
+          {icon && icon}
+          <span className="btn-content">{children}</span>
+        </>
+      )}
     </button>
   )
 }

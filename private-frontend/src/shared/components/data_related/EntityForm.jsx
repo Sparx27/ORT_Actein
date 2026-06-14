@@ -1,15 +1,19 @@
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import Input from '../Input'
-import { useState } from 'react'
 import MessageBox from '../MessageBox'
 import TextArea from '../TextArea'
 import Modal from '../Modal'
+import Select from '../Select'
+import ComboBox from '../ComboBox'
 
-const EntityForm = ({ title, onSubmit, apiRes, apiResType, controls = [] }) => {
-  const { register, handleSubmit, formState } = useForm()
+
+// useForm({ values }) → objeto con la forma { name: 'Cat1', dsc: 'Una dsc' }
+// Las keys tienen que coincidir con los name de los register)
+const EntityForm = ({ onSubmit, apiRes, apiResType, controls = [], values, formId }) => {
+  const { register, handleSubmit, formState, control } = useForm({ values })
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form id={formId} onSubmit={handleSubmit(onSubmit)}>
 
       {apiRes && (
         <MessageBox message={apiRes} type={apiResType} />
@@ -25,22 +29,63 @@ const EntityForm = ({ title, onSubmit, apiRes, apiResType, controls = [] }) => {
                   label={c.label}
                   type={c.type}
                   id={c.name}
-                  autoComplete
+                  autoComplete="true"
                   {...register(c.name)}
                 />
               </div>
+            )
+          }
 
+          if (controlType === 'textarea') {
+            return (
+              <div key={`econtrol${i}`} className="e-control-space">
+                <TextArea
+                  label={c.label}
+                  id={c.name}
+                  {...register(c.name)}
+                />
+              </div>
+            )
+          }
+
+          if (controlType === 'select') {
+            return (
+              <div key={`econtrol${i}`} className="e-control-space">
+                <Select
+                  label={c.label}
+                  id={c.name}
+                  placeholder={c.placeholder}
+                  options={c.options}
+                  {...register(c.name)}
+                />
+              </div>
+            )
+          }
+
+          if (controlType === 'combobox') {
+            return (
+              <div key={`econtrol${i}`} className="e-control-space">
+                <Controller
+                  name={c.name}
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <ComboBox
+                      label={c.label}
+                      id={c.name}
+                      placeholder={c.placeholder}
+                      options={c.options}
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={fieldState.error?.message}
+                    />
+                  )}
+                />
+              </div>
             )
           }
         })
       )}
 
-
-      <TextArea
-        label="Descripción"
-        id="dsc"
-        {...register('dsc')}
-      />
     </form>
   )
 }
