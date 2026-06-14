@@ -10,13 +10,13 @@ import ProductCategoryPage from '../features/product_category/ProductCategoryPag
 import NotFound from './NotFound'
 import ProductPage from '../features/product/ProductPage'
 import TextPage from './TextPage'
+import HomePage from '../features/Home/HomePage'
 
 function App() {
 
   return (
     <Providers>
       <Routes>
-
         <Route path="/test" element={<TextPage />} />
 
         <Route element={<AuthLayout />}>
@@ -24,7 +24,7 @@ function App() {
         </Route>
 
         <Route path="/" element={<MainLayout />}>
-          <Route index element={<h1 className="h1">Index</h1>} />
+          <Route index element={<HomePage />} />
           <Route path="/categorias" element={<ProductCategoryPage />} />
           <Route path="/productos" element={<ProductPage />} />
           <Route path="*" element={<NotFound />} />

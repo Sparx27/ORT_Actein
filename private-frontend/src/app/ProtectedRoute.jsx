@@ -1,11 +1,10 @@
-import { Outlet, Navigate } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
+import { useAuth } from '../shared/auth/useAuth'
 
 const ProtectedRoute = () => {
-  // Aca ya de paso estaria bueno una peticion para verificar jwt si sigue valido o whatever
-  const token = localStorage.getItem('jwt')
+  const { isAuth } = useAuth()
 
-  // Por ahora que finja demencia, luego agrego correctamente la funcionalidad
-  if (token) return <Navigate to={'/ingresar'} replace />
+  if (!isAuth) return <Navigate to="/ingresar" replace />
 
   return <Outlet />
 }
