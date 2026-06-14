@@ -19,6 +19,11 @@ def rep_get_categories(db: Session, search: str | None, limit: int, offset: int)
     return db.execute(query).scalars().all()
 
 
+def rep_get_categories_id_name(db: Session):
+    query = select(CategoryProduct.id, CategoryProduct.name).where(_IS_ACTIVE).order_by(CategoryProduct.name)
+    return db.execute(query).all()
+
+
 def rep_count_categories(
     db: Session,
     search: str | None,

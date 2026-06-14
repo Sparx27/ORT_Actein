@@ -3,8 +3,14 @@ from sqlalchemy.orm import Session
 
 from app.auth.auth_scheme import security
 from app.config.database import get_db
-from app.schemas.sch_category_product import SchCategoryPaginated, SchCategoryProduct, SchCategoryProductRequest
-from app.services.svc_category_product import svc_create_category, svc_deactivate_category, svc_get_categories, svc_modify_category
+from app.schemas.sch_category_product import SchCategory, SchCategoryPaginated, SchCategoryProduct, SchCategoryProductRequest
+from app.services.svc_category_product import (
+    svc_create_category,
+    svc_deactivate_category,
+    svc_get_categories,
+    svc_get_categories_id_name,
+    svc_modify_category,
+)
 
 category_router = APIRouter(dependencies=[Depends(security)])
 
@@ -27,3 +33,8 @@ def modify_category(data: SchCategoryProductRequest, id: int = Path(gt=0), db: S
 @category_router.patch('/categories/{id}/deactivate', response_model=SchCategoryProduct)
 def deactivate_category(id: int = Path(gt=0), db: Session = Depends(get_db)):
     return svc_deactivate_category(db, id)
+
+
+@category_router.get('/categories/options', response_model=list[SchCategory])
+def get_categories_id_name(db: Session = Depends(get_db)):
+    return svc_get_categories_id_name(db)

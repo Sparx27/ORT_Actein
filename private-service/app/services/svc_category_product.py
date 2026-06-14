@@ -7,6 +7,7 @@ from app.repositories.rep_category_product import (
     rep_create_category,
     rep_deactivate_category,
     rep_get_categories,
+    rep_get_categories_id_name,
     rep_get_category_by_id,
     rep_get_category_by_name,
     rep_modify_category,
@@ -52,6 +53,13 @@ def svc_deactivate_category(db: Session, category_id: int):
         return rep_deactivate_category(db, category)
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail='Error al desactivar la categoría')
+
+
+def svc_get_categories_id_name(db: Session):
+    try:
+        return rep_get_categories_id_name(db)
+    except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail='Error al obtener las categorías')
 
 
 def _validate_unique_name(db: Session, name: str, id: int | None = None):
