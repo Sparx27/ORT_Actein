@@ -1,3 +1,4 @@
+import ButtonIcon from '../ButtonIcon'
 import ContentBox from '../ContentBox'
 import MessageText from '../MessageText'
 
@@ -17,7 +18,7 @@ dataFrame = {
 }
 */
 const EntityTable = ({ dataFrame = {}, isLoading, isError, errorMsg }) => {
-  const { headers, rows, actions } = dataFrame
+  const { headers, rows, actions, renders } = dataFrame
 
   // Para cuando hay error o esta cargando, que la primera row ocupe toda la tabla...
   const totalSpan = (headers?.length ?? 0) + (actions?.length > 0 ? 1 : 0)
@@ -57,19 +58,20 @@ const EntityTable = ({ dataFrame = {}, isLoading, isError, errorMsg }) => {
                   rows.map((r, i) => (
                     <tr key={`tr-${i}`}>
                       {r.map((v, ii) => (
-                        <td key={`td-${i}-${ii}`}>{v}</td>
+                        <td key={`td-${i}-${ii}`}>
+                          {renders?.[ii] ? renders[ii](v, r) : v}
+                        </td>
                       ))}
                       {actions?.length > 0 && (
                         <td>
                           <div className="row-actions">
                             {actions.map((btn, bi) => (
-                              <button
+                              <ButtonIcon
                                 key={`btn-${i}-${bi}`}
-                                className={`btn-base btn-${btn.variant}`}
                                 onClick={() => btn.onClick(r, i)}
-                              >
-                                {btn.icon}
-                              </button>
+                                icon={btn.icon}
+                                danger={btn.danger ? true : false}
+                              />
                             ))}
                           </div>
                         </td>
