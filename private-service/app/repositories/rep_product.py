@@ -62,6 +62,27 @@ def rep_get_product_by_id(db: Session, id: int):
     return db.execute(query).scalars().first()
 
 
+def rep_get_product_detail_by_id(db: Session, id: int):
+    query = (
+        select(
+            Product.id,
+            Product.sku,
+            Product.name,
+            Product.description,
+            CategoryProduct.id.label('category_id'),
+            CategoryProduct.name.label('category_name'),
+            Product.brand,
+            Product.specifications,
+            Product.requires_installation,
+            Product.maintenance_time,
+            Product.is_active,
+        )
+        .join(CategoryProduct, Product.category_id == CategoryProduct.id, isouter=True)
+        .where(Product.id == id)
+    )
+    return db.execute(query).first()
+
+
 def rep_get_product_by_sku(db: Session, sku: str, exclude_id: int | None = None):
     filter_id = [] if exclude_id is None else [Product.id != exclude_id]
     query = select(Product).where(Product.sku == sku, *filter_id)
