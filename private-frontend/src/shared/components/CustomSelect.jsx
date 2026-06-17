@@ -1,71 +1,55 @@
 import { useState, useRef, useEffect } from 'react'
 
-const ComboBox = ({
+const CustomSelect = ({
   label,
   id,
   placeholder,
-  disabled = false,
-  error = false,
-  options = [],      // [{ value, label }]
-  value,             // value de la opción seleccionada (controlado)
-  onChange,          // recibe el value de la opción elegida
+  disabled,
+  error,
+  options = [],     // [{ value, label }]
+  value,            // controlado
+  onChange,         // recibe el value elegido
+  defaultOpt = '',
   extraClass
 }) => {
-  const [inputText, setInputText] = useState('')
   const [open, setOpen] = useState(false)
   const [highlighted, setHighlighted] = useState(0)
   const wrapRef = useRef(null)
 
-  // Label de la opción actualmente seleccionada (la fuente de verdad es `value`)
   const selectedLabel = options.find(o => String(o.value) === String(value))?.label ?? ''
 
-  // Si cambia la selección desde afuera (ej: values de un form de edición), sincroniza el texto
-  useEffect(() => {
-    setInputText(selectedLabel)
-  }, [selectedLabel])
-
-  // Cierre por clic afuera
   useEffect(() => {
     function handleClickOutside(e) {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) {
-        closeAndRevert()
+        setOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   })
 
-  const filtered = options.filter(o =>
-    o?.label?.toLowerCase().includes(inputText.toLowerCase())
-  )
-
-  function closeAndRevert() {
-    setOpen(false)
-    setInputText(selectedLabel) // texto libre no vale: vuelve a la última selección
-  }
-
   function selectOption(opt) {
     onChange(opt.value)
-    setInputText(opt.label)
     setOpen(false)
   }
 
   function handleKeyDown(e) {
-    if (!open && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+    if (!open && (e.key === 'ArrowDown' || e.key === 'Enter')) {
+      e.preventDefault()
       setOpen(true)
       return
     }
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setHighlighted(h => Math.min(h + 1, filtered.length - 1))
+      setHighlighted(h => Math.min(h + 1, options.length - 1))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       setHighlighted(h => Math.max(h - 1, 0))
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      if (filtered[highlighted]) selectOption(filtered[highlighted])
+      if (options[highlighted]) selectOption(options[highlighted])
     } else if (e.key === 'Escape') {
-      closeAndRevert()
+      setOpen(false)
     }
   }
 
@@ -76,28 +60,25 @@ const ComboBox = ({
       <div
         ref={wrapRef}
         className={[
-          'combo-wrap',
-          open ? 'combo-open' : '',
+          'cuselect-wrap',
+          open ? 'is-open' : '',
           error ? 'has-error' : '',
         ].filter(Boolean).join(' ')}
       >
-        <input
-          type="text"
+        <button
+          type="button"
           id={id}
-          placeholder={placeholder}
           disabled={disabled}
-          value={inputText}
-          autoComplete="off"
-          onChange={(e) => {
-            setInputText(e.target.value)
-            setOpen(true)
-            setHighlighted(0)
-          }}
-          onFocus={() => setOpen(true)}
+          className="cuselect-trigger"
+          onClick={() => setOpen(o => !o)}
           onKeyDown={handleKeyDown}
-        />
+        >
+          <span className={selectedLabel ? 'cuselect-value' : 'cuselect-placeholder'}>
+            {selectedLabel || placeholder}
+          </span>
+        </button>
 
-        <span className="combo-icon">
+        <span className="cuselect-icon">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <polyline points="6 9 12 15 18 9" />
@@ -105,15 +86,26 @@ const ComboBox = ({
         </span>
 
         {open && !disabled && (
-          <ul className="combo-list" role="listbox">
-            {filtered.length > 0 ? (
-              filtered.map((opt, i) => (
+          <ul className="cuselect-list" role="listbox">
+            <li
+              role="option"
+              className={[
+                'cuselect-option',
+                !value ? 'is-selected' : '',
+              ].filter(Boolean).join(' ')}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => selectOption({ value: '', label: defaultOpt })}
+            >
+              {defaultOpt}
+            </li>
+            {options.length > 0 ? (
+              options.map((opt, i) => (
                 <li
                   key={opt.value}
                   role="option"
                   aria-selected={String(opt.value) === String(value)}
                   className={[
-                    'combo-option',
+                    'cuselect-option',
                     i === highlighted ? 'is-highlighted' : '',
                     String(opt.value) === String(value) ? 'is-selected' : ''
                   ].filter(Boolean).join(' ')}
@@ -125,7 +117,7 @@ const ComboBox = ({
                 </li>
               ))
             ) : (
-              <li className="combo-empty">Sin resultados</li>
+              <li className="cuselect-empty">Sin opciones</li>
             )}
           </ul>
         )}
@@ -136,4 +128,4 @@ const ComboBox = ({
   )
 }
 
-export default ComboBox
+export default CustomSelect

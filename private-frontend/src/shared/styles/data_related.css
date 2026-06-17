@@ -52,13 +52,17 @@
   margin-left: 12px;
 }
 
+.data-filters-options {
+  width: 175px !important;
+}
+
 @media (max-width:768px) {
   .data-filters {
     flex-direction: column;
   }
 
-  .data-filters-select {
-    width: 100%;
+  .data-filters-options {
+    width: 100% !important;
   }
 
   .data-filters-input {
@@ -104,6 +108,12 @@
   color: var(--gray-500);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.data-table-wrap tbody td.col-actions {
+  width: 1%;
+  max-width: none;
   white-space: nowrap;
 }
 
