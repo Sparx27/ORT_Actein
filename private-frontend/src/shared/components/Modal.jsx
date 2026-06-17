@@ -52,17 +52,18 @@ function Modal({ isOpen, onClose, children }) {
       ref={overlayRef}
       onClick={handleOverlayClick}
     >
-      <dialog className="modal-box">
+      <div className="modal-box">
         {children}
-      </dialog>
+      </div>
     </div>
   )
 }
 
-Modal.Header = function ModalHeader({ title, onClose }) {
+Modal.Header = function ModalHeader({ onClose, children }) {
   return (
     <div className="modal-header">
-      <span className="modal-title">{title}</span>
+      <div>{children}</div>
+      {/* <span className="modal-title">{title}</span> */}
       <button className="btn-close" onClick={onClose} aria-label="Cerrar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth="2">

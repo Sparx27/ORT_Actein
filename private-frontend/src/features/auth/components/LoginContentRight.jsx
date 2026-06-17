@@ -1,41 +1,40 @@
 import { useForm } from 'react-hook-form'
 import CForm from '../../../shared/components/Form'
 import Input from '../../../shared/components/Input'
-import { useState } from 'react'
 import SvgEmail from '../../../shared/components/svgs/SvgEmail'
 import SvgPassword from '../../../shared/components/svgs/SvgPassword'
 import Button from '../../../shared/components/Button'
+import { useAuth } from '../../../shared/auth/useAuth'
+import { useNavigate } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
+import { loginQuery } from '../services/authService'
 
 const LoginContentRight = () => {
-  // RHF nos da tres cosas:
-  // - register: para conectar cada input al form
-  // - handleSubmit: wrapper que valida antes de llamar a nuestra función
-  // - errors: objeto con los errores de validación de cada campo
   const { register, handleSubmit, formState: { errors } } = useForm()
+  const { login } = useAuth()
+  const navigate = useNavigate()
 
-  // Feedback general del form (respuesta del servidor)
-  const [apiRes, setApiRes] = useState(null)
-  const [apiResType, setApiResType] = useState(null)
+  // useMutation maneja una acción que modifica algo (acá: autenticar).
+  // - mutationFn: la función async que hace el trabajo (la llamada al login)
+  const mutation = useMutation({
+    mutationFn: loginQuery,
+    onSuccess: (data) => {
+      login(data.access_token)  // guarda el token en contexto + localStorage
+      navigate('/', { replace: true })  // redirige al home
+    }
+  })
 
-  // Esta función SOLO se ejecuta si la validación de RHF pasó.
-  // data tiene los valores del form: { email: '...', password: '...' }
   const onSubmit = (data) => {
-    setApiRes(null)
-
-    // acá iría tu llamada al backend (mutación de TanStack Query, fetch, etc)
-    console.log('Login con:', data)
-
-    // si el backend rechaza las credenciales:
-    // setFeedback('Email o contraseña incorrectos.')
-    // setFeedbackType('error')
+    mutation.mutate(data)  // dispara la mutación con { email, password }
   }
+
   return (
     <section className="login-right-container">
       <div className="login-form-container">
         <CForm
           onSubmit={handleSubmit(onSubmit)}
-          message={apiRes}
-          messageType={apiResType}
+          message={mutation.isError ? mutation.error.message : null}
+          messageType="error"
           formHead={{ title: 'Acceso', txt: 'Ingresá tus credenciales para acceder al panel.' }}
         >
 
@@ -54,6 +53,7 @@ const LoginContentRight = () => {
             autoComplete="username"
             error={errors.email?.message}
             icon={<SvgEmail />}
+            extraClass={'input-login'}
           />
 
           <Input
@@ -68,12 +68,13 @@ const LoginContentRight = () => {
             autoComplete="current-password"
             error={errors.password?.message}
             icon={<SvgPassword />}
+            extraClass={'input-login'}
           />
 
-          <Button type="submit" bigPadding>Iniciar sesión</Button>
+          <Button type="submit" bigPadding extraClass={'fs-14'} loading={mutation?.isPending}>Iniciar sesión</Button>
         </CForm>
 
-        <div className="brand-footer-right">© 2026 Actein</div>
+        <div className="brand-footer-right">© Actein</div>
       </div>
     </section>
   )

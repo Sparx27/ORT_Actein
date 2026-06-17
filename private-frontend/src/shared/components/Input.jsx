@@ -6,13 +6,14 @@ const Input = forwardRef(({
   type = 'text',
   id,
   placeholder,
-  disabled,
-  autoComplete,
-  error,
+  disabled = false,
+  autoComplete = 'true',
+  error = false,
+  extraClass,
   ...rest   // para capturar name, onChange, onBlur que vienen de register()
 }, ref) => {
   return (
-    <div className="field">
+    <div className={extraClass ? `field ${extraClass}` : 'field'}>
       {label && <label className="field-label" htmlFor={id}>{label}</label>}
 
       <div className={[
