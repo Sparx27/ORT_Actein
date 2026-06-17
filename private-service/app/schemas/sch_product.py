@@ -55,10 +55,13 @@ class SchProductDetail(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    sku: str | None = None
     name: str
     description: str | None = None
-    category_name: str | None = None
     category_id: int | None = None
+    category_name: str | None = None
     brand: str
     specifications: str | None = None
     requires_installation: bool | None = None
+    maintenance_time: int | None = None
+    is_active: bool

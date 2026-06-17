@@ -3,8 +3,14 @@ from sqlalchemy.orm import Session
 
 from app.auth.auth_scheme import security
 from app.config.database import get_db
-from app.schemas.sch_product import SchProduct, SchProductPaginated, SchProductRequest, SchProductStatusUpdate
-from app.services.svc_product import svc_create_product, svc_get_products, svc_modify_product, svc_update_status
+from app.schemas.sch_product import SchProduct, SchProductDetail, SchProductPaginated, SchProductRequest, SchProductStatusUpdate
+from app.services.svc_product import (
+    svc_create_product,
+    svc_get_product_detail_by_id,
+    svc_get_products,
+    svc_modify_product,
+    svc_update_status,
+)
 
 product_router = APIRouter(dependencies=[Depends(security)])
 
@@ -19,6 +25,11 @@ def get_products(
     is_active: bool | None = Query(default=None),
 ):
     return svc_get_products(db, page, search, category_id, brand, is_active)
+
+
+@product_router.get('/products/{id}', response_model=SchProductDetail)
+def get_product_by_id(id: int = Path(gt=0), db: Session = Depends(get_db)):
+    return svc_get_product_detail_by_id(db, id)
 
 
 @product_router.post('/products', response_model=SchProduct, status_code=201)
