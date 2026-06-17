@@ -1,4 +1,4 @@
-from sqlalchemy import func, or_, select
+from sqlalchemy import exists, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.models.mod_category_product import CategoryProduct
@@ -43,7 +43,7 @@ def rep_get_products(
         )
         .join(CategoryProduct, Product.category_id == CategoryProduct.id, isouter=True)
         .where(*filters_)
-        .order_by(Product.name)
+        .order_by(Product.id)
         .limit(limit)
         .offset(offset)
     )
@@ -60,6 +60,27 @@ def rep_count_products(db: Session, search: str | None, category_id: int | None,
 def rep_get_product_by_id(db: Session, id: int):
     query = select(Product).where(Product.id == id)
     return db.execute(query).scalars().first()
+
+
+def rep_get_product_detail_by_id(db: Session, id: int):
+    query = (
+        select(
+            Product.id,
+            Product.sku,
+            Product.name,
+            Product.description,
+            CategoryProduct.id.label('category_id'),
+            CategoryProduct.name.label('category_name'),
+            Product.brand,
+            Product.specifications,
+            Product.requires_installation,
+            Product.maintenance_time,
+            Product.is_active,
+        )
+        .join(CategoryProduct, Product.category_id == CategoryProduct.id, isouter=True)
+        .where(Product.id == id)
+    )
+    return db.execute(query).first()
 
 
 def rep_get_product_by_sku(db: Session, sku: str, exclude_id: int | None = None):
@@ -82,3 +103,8 @@ def rep_modify_product(db: Session, product: Product, fields: dict):
     db.commit()
     db.refresh(product)
     return product
+
+
+def rep_exists_active_product_in_category(db: Session, category_id: int):
+    query = select(exists().where(Product.category_id == category_id, Product.is_active.is_(True)))
+    return db.execute(query).scalar()
