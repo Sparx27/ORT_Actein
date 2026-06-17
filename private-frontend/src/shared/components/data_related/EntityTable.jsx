@@ -31,8 +31,10 @@ const EntityTable = ({ dataFrame = {}, isLoading, isError, errorMsg }) => {
           <table>
             <thead>
               <tr>
-                {headers?.length > 0 && headers.map((h, i) => <th key={`th-${i}`}>{h}</th>)}
-                {actions && <th>Acciones</th>}
+                {headers?.length > 0 && headers.map((h, i) => (
+                  <th key={`th-${i}`} className={h === 'id' ? 'col-id' : ''}>{h}</th>
+                ))}
+                {actions && <th className="col-actions">Acciones</th>}
               </tr>
             </thead>
 
@@ -58,12 +60,12 @@ const EntityTable = ({ dataFrame = {}, isLoading, isError, errorMsg }) => {
                   rows.map((r, i) => (
                     <tr key={`tr-${i}`}>
                       {r.map((v, ii) => (
-                        <td key={`td-${i}-${ii}`}>
+                        <td key={`td-${i}-${ii}`} className={ii === 0 ? 'col-id' : ''}>
                           {renders?.[ii] ? renders[ii](v, r) : v}
                         </td>
                       ))}
                       {actions?.length > 0 && (
-                        <td>
+                        <td className="col-actions">
                           <div className="row-actions">
                             {actions.map((btn, bi) => (
                               <ButtonIcon

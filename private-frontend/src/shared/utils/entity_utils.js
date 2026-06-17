@@ -1,29 +1,16 @@
-
-/*
-dataFrame = {
-  headers: ['col1', 'col2'],
-  rows: [
-    [val1, val2],
-    [val3, null]
-  ],
-  actions: [
-    {
-      label: 'editar',
-      icon: <SvgEdit />,
-    }
-  ]
-}
-*/
-export const entitiesToDataframe = (
-  headers = [],
-  rowSelect = [],
-  rows = [],
-  btnList = []
-) => {
+export const entitiesToDataframe = (columns = [], rows = [], btnList = []) => {
   const dataFrame = {}
-  dataFrame.rows = rows.map(o => rowSelect.map(h => o[h.toLowerCase()]))
-  dataFrame.headers = headers.map(h => h.charAt(0).toUpperCase() + h.slice(1).toLowerCase())
+  const renders = {}
+
+  dataFrame.headers = columns.map((c, i) => {
+    if (c.render) renders[i] = c.render
+    return c.header.charAt(0).toUpperCase() + c.header.slice(1).toLowerCase()
+  })
+
+  dataFrame.rows = rows.map(o => columns.map(c => o[c.key.toLowerCase()]))
+  dataFrame.renders = renders
   dataFrame.actions = btnList
+
   return dataFrame
 }
 

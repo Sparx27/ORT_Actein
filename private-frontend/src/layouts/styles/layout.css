@@ -17,9 +17,12 @@
 /** SIDEBAR **/
 
 .main-layout-sidebar {
-  background-color: var(--navy);
+  position: sticky;
+  top: 0;
   height: 100vh;
   overflow-y: scroll;
+  scrollbar-width: none;
+  background-color: var(--navy);
   /* Firefox */
   scrollbar-width: none;
   display: flex;

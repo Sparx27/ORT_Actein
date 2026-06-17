@@ -21,6 +21,10 @@ import Button from '../../shared/components/Button'
 import SvgEdit from '../../shared/components/svgs/SvgEdit'
 import SvgDelete from '../../shared/components/svgs/SvgDelete'
 import EntityPagination from '../../shared/components/data_related/EntityPagination'
+import { useForm } from 'react-hook-form'
+import { useSearchParams } from 'react-router-dom'
+import { UI_CONFIG } from './config/uiConfig'
+import { API_FIELDS, FILTER_PARAMS } from './config/fieldsConfig'
 
 const CATEGORIES = [
   {
@@ -79,33 +83,67 @@ const CATEGORIES = [
   }
 ]
 
-const filterControls = [
-  {
-    type: 'text',
-    placeholder: 'Buscar por nombre',
-    icon: <SvgSearch w={15} h={15} />,
-    onSubmit: () => console.log('buscar'),
-    name: 'search'
-  }
-]
+const { API_SEARCH } = API_FIELDS
 
 const ProductCategoryPage = () => {
   const { page, currentParams, setPage, setCurrentParams } = useCategoriesParams()
   const { categoriesQuery } = useCategories({ page, ...currentParams })
-  const [apiRes, setApiRes] = useState('')
-  const [apiResType, setApiResType] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deletingCategory, setDeletingCategory] = useState(null)
+  const [searchParams] = useSearchParams()
+  const { register, handleSubmit, setValue, getValues } = useForm({
+    defaultValues: Object.fromEntries(
+      Object.entries(FILTER_PARAMS).map(
+        ([apiField, urlParam]) => [apiField, searchParams.get(urlParam) ?? '']
+      )
+    )
+  })
 
+  // FILTER DATA
+  const handleFilterSubmit = (data) => {
+    setCurrentParams(data)
+  }
+
+  const filterControls = [
+    {
+      type: 'text',
+      placeholder: 'Buscar por nombre',
+      icon: <SvgSearch w={15} h={15} />,
+      name: API_SEARCH
+    }
+  ]
+
+  const handleCleanFilters = () => {
+    Object.keys(FILTER_PARAMS).forEach(field => setValue(field, ''))
+    setCurrentParams()
+  }
+
+  // CREATE DATA
+  const btnHeaderList = [
+    {
+      label: 'Nueva Categoría',
+      icon: <SvgAdd />,
+      onClick: () => setModalOpen(true),
+      variant: 'primary'
+    }
+  ]
+
+  // EDIT DATA
+
+  // DELETE DATA
+  const handleConfirmDelete = () => {
+    console.log('eliminar', deletingCategory?.id)
+    setDeleteModalOpen(false)
+  }
+
+  // SHOW DATA
   let apiData = categoriesQuery.data
 
-  // IMPORTANTE: PASAR ESTE ISERROR AL ENTITY TABLE...
-  //if (categoriesQuery.error) return <MessageBox message={categoriesQuery.error.message} type="error" />
-
-  const btnList = [
+  // Edit & Delete Actions
+  const btnEntityActions = [
     {
       icon: <SvgEdit />,
       onClick: (row) => {
@@ -125,45 +163,11 @@ const ProductCategoryPage = () => {
     }
   ]
 
-  const entityFormControls = [
-    {
-      controlType: 'input',
-      type: 'text',
-      label: 'Nombre',
-      name: 'name'
-    },
-    {
-      controlType: 'textarea',
-      label: 'Descripción',
-      name: 'dsc'
-    }
-  ]
-
   const categoriesDataframe = entitiesToDataframe(
-    ['id', 'nombre'],
-    ['id', 'name'],
+    UI_CONFIG.tableColumns,
     apiData?.categories,
-    btnList
+    btnEntityActions
   )
-
-  const handleSubmit = (data) => {
-    console.log(data)
-    setModalOpen(false)
-  }
-
-  const handleConfirmDelete = () => {
-    console.log('eliminar', deletingCategory?.id)
-    setDeleteModalOpen(false)
-  }
-
-  const btnHeaderList = [
-    {
-      label: 'Nueva Categoría',
-      icon: <SvgAdd />,
-      onClick: () => setModalOpen(true),
-      variant: 'primary'
-    }
-  ]
 
   return (
     <>
@@ -177,16 +181,21 @@ const ProductCategoryPage = () => {
         />
 
         <EntityPageContainer>
-          <EntityFilters controls={filterControls} />
+          <EntityFilters
+            onSubmit={handleSubmit(handleFilterSubmit)}
+            register={register}
+            controls={filterControls}
+            reset={handleCleanFilters}
+          />
           <EntityTable
             dataFrame={categoriesDataframe}
             isLoading={categoriesQuery.isLoading}
-          // isError={categoriesQuery.error}
-          // errorMsg={categoriesQuery.error?.message ?? 'Error al cargar los datos, por favor intente nuevamente'}
+            isError={categoriesQuery.error}
+            errorMsg={categoriesQuery.error?.message ?? 'Error al cargar los datos, por favor intente nuevamente'}
           />
           <EntityPagination
             currentPage={page}
-            totalPages={apiData?.total_pages}
+            totalPages={apiData?.total_pages ?? 1}
             onPageChange={setPage}
           />
         </EntityPageContainer>
@@ -196,7 +205,7 @@ const ProductCategoryPage = () => {
             <EntityFormHeader title={'Crear nueva categoría'} icon={<SvgTag />} />
           </Modal.Header>
           <Modal.Body>
-            <EntityForm controls={entityFormControls} onSubmit={handleSubmit} />
+            {/* <EntityForm controls={entityFormControls} onSubmit={handleSubmit} /> */}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancelar</Button>
@@ -209,11 +218,11 @@ const ProductCategoryPage = () => {
             <EntityFormHeader title="Editar categoría" icon={<SvgTag />} />
           </Modal.Header>
           <Modal.Body>
-            <EntityForm
+            {/* <EntityForm
               controls={entityFormControls}
               onSubmit={handleSubmit}
               values={editingCategory ? { name: editingCategory.name, dsc: editingCategory.dsc } : undefined}
-            />
+            /> */}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="ghost" onClick={() => setEditModalOpen(false)}>Cancelar</Button>

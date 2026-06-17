@@ -1,35 +1,40 @@
 import { useSearchParams } from 'react-router-dom'
+import { API_FIELDS, FILTER_PARAMS, URL_PARAMS } from '../config/fieldsConfig'
+
+const { URL_PAGE } = URL_PARAMS
+const { API_PAGE } = API_FIELDS
 
 const useProductsParams = () => {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const page = Number(searchParams.get('pagina') ?? 1)
-  const search = searchParams.get('busqueda')
+  const page = Number(searchParams.get(URL_PAGE) ?? 1)
 
   const setPage = (newPage) => {
     setSearchParams(prev => {
-      prev.set('pagina', newPage)
+      prev.set(URL_PAGE, newPage)
       return prev
     })
   }
 
   const setCurrentParams = (newParams = {}) => {
-    const { search } = newParams
     setSearchParams(prev => {
-      prev.set('pagina', 1)
-      prev.delete('busqueda')
-
-      if (search) prev.set('busqueda', search)
+      prev.set(URL_PAGE, 1)
+      Object.entries(FILTER_PARAMS).forEach(([apiField, urlParam]) => {
+        const value = newParams[apiField]
+        if (value) prev.set(urlParam, value)
+        else prev.delete(urlParam)
+      })
       return prev
     })
   }
 
-  // Esto es basicamente armar el objeto con todos los params actuales, y si por ejemplo no aplique search aun,
-  // el objeto resultante no tiene key-value para esa entrada. Por eso el filter
+  // Lee cada filtro desde la URL -> al recargar la página los filtros se reconstruyen
   const currentParams = Object.fromEntries(
-    Object.entries({ page, search })
+    Object.entries(FILTER_PARAMS)
+      .map(([apiField, urlParam]) => [apiField, searchParams.get(urlParam)])
       .filter(([, v]) => v !== null && v !== undefined && v !== '')
   )
+  currentParams[API_PAGE] = page
 
   return {
     page,
