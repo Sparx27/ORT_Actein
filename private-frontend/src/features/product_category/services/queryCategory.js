@@ -1,13 +1,7 @@
 import { privateService } from '../../../config/privateServiceConfig'
 
-export const getCategories = async ({ page, search }) => {
-
-  const params = {
-    ...(page && { page }),
-    ...(search && { search })
-  }
-
-  const { data } = await privateService.get('/categories', { params })
+export const getCategories = async (filters = {}) => {
+  const { data } = await privateService.get('/categories', { params: filters })
   return data
 }
 

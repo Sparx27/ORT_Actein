@@ -21,17 +21,11 @@ import EntityPagination from '../../shared/components/data_related/EntityPaginat
 import TagCell from '../../shared/components/data_related/table_renders/TagCell'
 import StatusBadge from '../../shared/components/data_related/table_renders/StatusBadge'
 import TitleAndSub from '../../shared/components/data_related/table_renders/TitleAndSub'
-
-
-
-const filterControls = [
-  {
-    type: 'text',
-    placeholder: 'Buscar por nombre',
-    icon: <SvgSearch w={15} h={15} />,
-    onSubmit: () => console.log('buscar')
-  }
-]
+import useProductsCats from './hooks/useProductsCats'
+import { useForm } from 'react-hook-form'
+import { useSearchParams } from 'react-router-dom'
+import { API_FIELDS, FILTER_PARAMS } from './config/fieldsConfig'
+import { UI_CONFIG } from './config/uiConfig'
 
 const PRODUCTS = [
   {
@@ -137,19 +131,71 @@ const CATEGORIES = [
   }
 ]
 
+const { API_SEARCH, API_CATEGORY, API_BRAND, API_IS_ACTIVE } = API_FIELDS
+
 const ProductPage = () => {
   const { page, currentParams, setPage, setCurrentParams } = useProductsParams()
   const { productsQuery } = useProducts({ page, ...currentParams })
+  const { productCats } = useProductsCats()
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deletingProduct, setDeletingProduct] = useState(null)
+  const [searchParams] = useSearchParams()
+  const { register, handleSubmit, setValue, control, getValues } = useForm({
+    defaultValues: Object.fromEntries(
+      Object.entries(FILTER_PARAMS).map(
+        ([apiField, urlParam]) => [apiField, searchParams.get(urlParam) ?? '']
+      )
+    )
+  })
 
-  // IMPORTANTE: PASAR ESTE ISERROR AL ENTITY TABLE...
-  //if (productsQuery.error) return <MessageBox message={productsQuery.error.message} type="error" />
+  console.log('a', getValues())
 
-  const { categories, total_pages } = productsQuery.data
+  // FILTER DATA
+  const handleFilterSubmit = (data) => {
+    setCurrentParams(data)
+  }
+
+  const parsedCats = productCats?.data?.map(c => { return { value: c.id, label: c.name } }) ?? []
+
+  const filterControls = [
+    {
+      type: 'text',
+      name: API_SEARCH,
+      placeholder: 'Buscar por nombre',
+      icon: <SvgSearch w={15} h={15} />
+    },
+    {
+      type: 'combobox',
+      name: API_CATEGORY,
+      placeholder: 'Categoría',
+      options: parsedCats,
+      control: control
+    },
+    {
+      type: 'text',
+      name: API_BRAND,
+      placeholder: 'Marca',
+    },
+    {
+      type: 'select',
+      name: API_IS_ACTIVE,
+      placeholder: 'Producto activo',
+      defaultOpt: 'Ambos',
+      options: [
+        { value: 'true', label: 'Si' },
+        { value: 'false', label: 'No' }
+      ],
+      control: control
+    }
+  ]
+
+  const handleCleanFilters = () => {
+    Object.keys(FILTER_PARAMS).forEach(field => setValue(field, ''))
+    setCurrentParams()
+  }
 
   const btnHeaderList = [
     {
@@ -159,45 +205,6 @@ const ProductPage = () => {
       variant: 'primary'
     }
   ]
-
-  const btnList = [
-    {
-      icon: <SvgEdit />,
-      onClick: (row) => {
-        const product = PRODUCTS.find(c => String(c.id) === String(row[0]))
-        setEditingProduct(product)
-        setEditModalOpen(true)
-      }
-    },
-    {
-      icon: <SvgDelete />,
-      onClick: (row) => {
-        const product = PRODUCTS.find(c => String(c.id) === String(row[0]))
-        setDeletingProduct(product)
-        setDeleteModalOpen(true)
-      },
-      danger: true
-    }
-  ]
-
-  const productsView = PRODUCTS.map(p => ({
-    ...p,
-    namebrand: { title: p.name, sub: p.brand },
-    isactive: p.isActive
-  }))
-
-  const productsDataframe = entitiesToDataframe(
-    ['id', 'nombre', 'categoría', 'activo'],
-    ['id', 'nameBrand', 'catery_name', 'isActive'],
-    productsView,
-    btnList
-  )
-
-  productsDataframe.renders = {
-    1: (v) => <TitleAndSub title={v.title} sub={v.sub} />,
-    2: (v) => <TagCell>{v}</TagCell>,
-    3: (v) => <StatusBadge active={v} />
-  }
 
   const handleCreate = (data) => {
     console.log(data)
@@ -235,6 +242,41 @@ const ProductPage = () => {
     setDeleteModalOpen(false)
   }
 
+  // SHOW DATA
+  const apiData = productsQuery.data
+
+  // Edit & Delete Actions
+  const btnEntityActions = [
+    {
+      icon: <SvgEdit />,
+      onClick: (row) => {
+        const product = PRODUCTS.find(c => String(c.id) === String(row[0]))
+        setEditingProduct(product)
+        setEditModalOpen(true)
+      }
+    },
+    {
+      icon: <SvgDelete />,
+      onClick: (row) => {
+        const product = PRODUCTS.find(c => String(c.id) === String(row[0]))
+        setDeletingProduct(product)
+        setDeleteModalOpen(true)
+      },
+      danger: true
+    }
+  ]
+
+  const productsView = apiData?.products?.map(p => ({
+    ...p,
+    name_brand: { title: p.name, sub: p.brand },
+  })) || []
+
+  const productsDataframe = entitiesToDataframe(
+    UI_CONFIG.tableColumns,
+    productsView,
+    btnEntityActions
+  )
+
   return (
     <>
       <Breadcrumb />
@@ -245,16 +287,21 @@ const ProductPage = () => {
         />
 
         <EntityPageContainer>
-          <EntityFilters controls={filterControls} />
+          <EntityFilters
+            onSubmit={handleSubmit(handleFilterSubmit)}
+            register={register}
+            controls={filterControls}
+            reset={handleCleanFilters}
+          />
           <EntityTable
             dataFrame={productsDataframe}
             isLoading={productsQuery.isLoading}
-          //isError={productsQuery.error}
-          //errorMsg={productsQuery.error?.message ?? 'Error al cargar los datos, por favor intente nuevamente'}
+            isError={productsQuery.error}
+            errorMsg={productsQuery.error?.message ?? 'Error al cargar los datos, por favor intente nuevamente'}
           />
           <EntityPagination
             currentPage={page}
-            totalPages={productsQuery?.total_pages ?? 10}
+            totalPages={apiData?.total_pages ?? 1}
             onPageChange={setPage}
           />
         </EntityPageContainer>

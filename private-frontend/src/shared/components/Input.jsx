@@ -6,9 +6,9 @@ const Input = forwardRef(({
   type = 'text',
   id,
   placeholder,
-  disabled,
-  autoComplete = 'false',
-  error,
+  disabled = false,
+  autoComplete = 'true',
+  error = false,
   extraClass,
   ...rest   // para capturar name, onChange, onBlur que vienen de register()
 }, ref) => {

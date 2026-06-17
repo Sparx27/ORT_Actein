@@ -156,6 +156,10 @@ ol {
   font-size: 14px !important;
 }
 
+.no-hidden {
+  overflow: visible !important;
+}
+
 /****************** SHARED COMPONENTS ******************/
 
 .container {
@@ -808,6 +812,11 @@ ol {
   font-family: var(--font-main);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  cursor: pointer;
+}
+
+.combo-wrap.combo-open input {
+  cursor: text;
 }
 
 .combo-wrap input::placeholder {
@@ -873,6 +882,168 @@ ol {
   padding: 8px 10px;
   font-size: 13px;
   color: var(--gray-400);
+}
+
+/* Chebox */
+.checkbox-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-wrap input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-box {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  background: var(--gray-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.checkbox-check {
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.checkbox-wrap input:checked~.checkbox-box {
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.checkbox-wrap input:checked~.checkbox-box .checkbox-check {
+  opacity: 1;
+}
+
+.checkbox-wrap input:focus-visible~.checkbox-box {
+  box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.12);
+}
+
+.checkbox-label {
+  font-size: 13px;
+  color: var(--gray-700);
+}
+
+.checkbox-wrap.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.checkbox-wrap.has-error .checkbox-box {
+  border-color: #ef4444;
+}
+
+/* Custom select */
+.cuselect-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cuselect-wrap.is-open {
+  z-index: 50;
+}
+
+.cuselect-trigger {
+  width: 100%;
+  height: 36px;
+  padding: 0 34px 0 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background: var(--gray-50);
+  font-size: 13px;
+  font-family: var(--font-main);
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.cuselect-trigger:focus {
+  border-color: var(--teal);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.12);
+}
+
+.cuselect-trigger:disabled {
+  background: var(--gray-100);
+  color: var(--gray-400);
+  cursor: not-allowed;
+}
+
+.cuselect-value {
+  color: var(--gray-900);
+}
+
+.cuselect-placeholder {
+  color: var(--gray-400);
+}
+
+.cuselect-icon {
+  position: absolute;
+  right: 12px;
+  color: var(--gray-500);
+  display: flex;
+  pointer-events: none;
+}
+
+.cuselect-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  z-index: 10;
+}
+
+.cuselect-option {
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--gray-700);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.cuselect-option.is-highlighted {
+  background: var(--gray-100);
+}
+
+.cuselect-option.is-selected {
+  background: var(--teal-bg);
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.cuselect-empty {
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--gray-400);
+}
+
+.cuselect-wrap.has-error .cuselect-trigger {
+  border-color: #ef4444;
+  background: #fef2f2;
 }
 
 /* Estado de error, mismo patrón que input/select */

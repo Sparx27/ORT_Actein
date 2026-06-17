@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getToken } from '../shared/auth/handleToken'
+import { getToken, removeToken } from '../shared/auth/handleToken'
 export const VITE_URL_PRIVATE_SERVICE = import.meta.env.VITE_URL_PRIVATE_SERVICE
 
 // AUTH
@@ -10,7 +10,7 @@ export const authService = axios.create({
 authService.interceptors.response.use(
   (res) => res,
   (error) => {
-    const message = error.response?.data?.detail ?? 'Error de conexión, por favor intente nuevamente más tarde'
+    const message = error.response?.data?.detail ?? 'Error de conexión, intente nuevamente más tarde'
     return Promise.reject(new Error(message))
   }
 )
@@ -22,14 +22,18 @@ export const privateService = axios.create({
 
 privateService.interceptors.request.use((config) => {
   const token = getToken()
-  config.headers.Authorization = `Bearer ${token}`
+  if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
 privateService.interceptors.response.use(
   (res) => res,
   (error) => {
-    const message = error.response?.data?.detail ?? 'Error de conexión, por favor intente nuevamente más tarde'
+    const message = error.response?.data?.detail ?? 'Error de conexión, intente nuevamente más tarde'
+    if (error.status === 401) {
+      removeToken()
+      window.location.href = '/ingresar'
+    }
     return Promise.reject(new Error(message))
   }
 )
