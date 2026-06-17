@@ -44,10 +44,11 @@ def svc_create_product(db: Session, product_create: SchProductRequest):
 def svc_modify_product(db: Session, product_id: int, product_modify: SchProductRequest):
     try:
         product = svc_get_product_by_id(db, product_id)
-        if product_modify.category_id is not None:
-            validate_exists(rep_get_category_by_id(db, product_modify.category_id), 'Categoría')
         if product_modify.sku is not None:
             _validate_unique_sku(db, product_modify.sku, product_id)
+        if product_modify.category_id is not None:
+            validate_exists(rep_get_category_by_id(db, product_modify.category_id), 'Categoría')
+
         product_dict = product_modify.model_dump()
         return rep_modify_product(db, product, product_dict)
     except SQLAlchemyError:
