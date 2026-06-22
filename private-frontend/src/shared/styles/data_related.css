@@ -251,6 +251,10 @@
   margin-bottom: 12px;
 }
 
+.e-control-space .checkbox-label {
+  font-weight: 600;
+}
+
 .title-and-sub {
   min-width: 0;
 }
