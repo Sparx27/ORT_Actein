@@ -275,6 +275,26 @@ ol {
   border-color: var(--red);
 }
 
+.btn-danger {
+  background: #e5484d;
+  color: var(--white);
+}
+
+.btn-danger:hover {
+  background: #ce3a3f;
+}
+
+.btn-danger-ghost {
+  background: transparent;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+.btn-danger-ghost:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+}
+
 @media (max-width:768px) {
   .btn-base.btn-hide-txt-mobile .btn-content {
     display: none;
@@ -390,6 +410,7 @@ ol {
   z-index: 1;
   padding: 16px;
   animation: fadeIn 0.18s ease;
+  overflow-y: auto;
 }
 
 .modal-box {
@@ -400,7 +421,9 @@ ol {
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   animation: scaleIn 0.18s ease;
   z-index: 2;
 }
@@ -413,6 +436,10 @@ ol {
   right: 0;
   height: 4px;
   background: linear-gradient(90deg, var(--teal), #38bdf8, var(--navy));
+}
+
+.modal-box.modal-danger::before {
+  background: linear-gradient(90deg, #b4433f, #f0524f, #e5484d, #ff6b6b);
 }
 
 @keyframes fadeIn {
@@ -442,6 +469,7 @@ ol {
   gap: 12px;
   padding: 20px 24px 16px;
   border-bottom: 1px solid var(--gray-100);
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -453,6 +481,9 @@ ol {
 
 .modal-body {
   padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .modal-confirm-text {
@@ -468,6 +499,7 @@ ol {
   justify-content: flex-end;
   gap: 10px;
   background-color: var(--gray-50);
+  flex-shrink: 0;
 }
 
 .btn-close {

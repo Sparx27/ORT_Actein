@@ -71,7 +71,7 @@ const EntityTable = ({ dataFrame = {}, isLoading, isError, errorMsg }) => {
                               <ButtonIcon
                                 key={`btn-${i}-${bi}`}
                                 onClick={() => btn.onClick(r, i)}
-                                icon={btn.icon}
+                                icon={btn.icon()}
                                 danger={btn.danger ? true : false}
                               />
                             ))}

@@ -26,6 +26,7 @@ import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
 import { API_FIELDS, FILTER_PARAMS } from './config/fieldsConfig'
 import { UI_CONFIG } from './config/uiConfig'
+import useCreateProduct from './hooks/useCreateProduct'
 
 const PRODUCTS = [
   {
@@ -120,17 +121,6 @@ const PRODUCTS = [
   }
 ]
 
-const CATEGORIES = [
-  {
-    value: 1,
-    label: 'Cat1',
-  },
-  {
-    value: 2,
-    label: 'Cat___2',
-  }
-]
-
 const { API_SEARCH, API_CATEGORY, API_BRAND, API_IS_ACTIVE } = API_FIELDS
 
 const ProductPage = () => {
@@ -143,7 +133,7 @@ const ProductPage = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deletingProduct, setDeletingProduct] = useState(null)
   const [searchParams] = useSearchParams()
-  const { register, handleSubmit, setValue, control, getValues } = useForm({
+  const { register, handleSubmit, setValue, control } = useForm({
     defaultValues: Object.fromEntries(
       Object.entries(FILTER_PARAMS).map(
         ([apiField, urlParam]) => [apiField, searchParams.get(urlParam) ?? '']
@@ -151,92 +141,50 @@ const ProductPage = () => {
     )
   })
 
-  console.log('a', getValues())
+  // SHARED
+  const parsedCats = productCats?.data?.map(c => { return { value: c.id, label: c.name } }) ?? []
 
   // FILTER DATA
   const handleFilterSubmit = (data) => {
     setCurrentParams(data)
   }
 
-  const parsedCats = productCats?.data?.map(c => { return { value: c.id, label: c.name } }) ?? []
-
-  const filterControls = [
-    {
-      type: 'text',
-      name: API_SEARCH,
-      placeholder: 'Buscar por nombre',
-      icon: <SvgSearch w={15} h={15} />
-    },
-    {
-      type: 'combobox',
-      name: API_CATEGORY,
-      placeholder: 'Categoría',
-      options: parsedCats,
-      control: control
-    },
-    {
-      type: 'text',
-      name: API_BRAND,
-      placeholder: 'Marca',
-    },
-    {
-      type: 'select',
-      name: API_IS_ACTIVE,
-      placeholder: 'Producto activo',
-      defaultOpt: 'Ambos',
-      options: [
-        { value: 'true', label: 'Si' },
-        { value: 'false', label: 'No' }
-      ],
-      control: control
-    }
-  ]
+  const filterControls = UI_CONFIG.formFilterControls(control, parsedCats)
 
   const handleCleanFilters = () => {
     Object.keys(FILTER_PARAMS).forEach(field => setValue(field, ''))
     setCurrentParams()
   }
 
-  const btnHeaderList = [
-    {
-      label: 'Nuevo Producto',
-      icon: <SvgAdd />,
-      onClick: () => setCreateModalOpen(true),
-      variant: 'primary'
-    }
-  ]
+  // CREATE DATA
+  const btnHeaderList = UI_CONFIG.btnHeaderList(setCreateModalOpen)
+
+  const { createMutation } = useCreateProduct()
 
   const handleCreate = (data) => {
     console.log(data)
-    setCreateModalOpen(false)
+    const body = {
+      sku: data.c_sku || null,
+      name: data.c_name,
+      description: data.c_description || null,
+      category_id: data.c_category_id || null,
+      brand: data.c_brand,
+      specifications: data.c_specifications || null,
+      requires_installation: data.c_requires_installation,
+      maintenance_time: data.c_maintenance_time ? Number(data.c_maintenance_time) : null,
+    }
+    createMutation.mutate(body)
   }
 
-  const entityFormControls = [
-    {
-      controlType: 'input',
-      type: 'text',
-      label: 'Nombre',
-      name: 'name'
-    },
-    {
-      controlType: 'textarea',
-      label: 'Descripción',
-      name: 'dsc'
-    },
-    {
-      controlType: 'combobox',
-      label: 'Categoría',
-      name: 'category_id',
-      options: CATEGORIES,
-      placeholder: 'Seleccionar'
-    },
-  ]
+  const entityFormControls = UI_CONFIG.formCreateControls(parsedCats)
 
+  // EDIT DATA
   const handleEdit = (data) => {
     console.log(data)
     setEditModalOpen(false)
   }
 
+  // DELETE DATA
   const handleDelete = () => {
     console.log('eliminar', deletingProduct?.id)
     setDeleteModalOpen(false)
@@ -246,25 +194,12 @@ const ProductPage = () => {
   const apiData = productsQuery.data
 
   // Edit & Delete Actions
-  const btnEntityActions = [
-    {
-      icon: <SvgEdit />,
-      onClick: (row) => {
-        const product = PRODUCTS.find(c => String(c.id) === String(row[0]))
-        setEditingProduct(product)
-        setEditModalOpen(true)
-      }
-    },
-    {
-      icon: <SvgDelete />,
-      onClick: (row) => {
-        const product = PRODUCTS.find(c => String(c.id) === String(row[0]))
-        setDeletingProduct(product)
-        setDeleteModalOpen(true)
-      },
-      danger: true
-    }
-  ]
+  const btnEntityActions = UI_CONFIG.tableActions(
+    setEditingProduct,
+    setEditModalOpen,
+    setDeletingProduct,
+    setDeleteModalOpen,
+    PRODUCTS)
 
   const productsView = apiData?.products?.map(p => ({
     ...p,
@@ -315,11 +250,18 @@ const ProductPage = () => {
               formId="create-product-form"
               controls={entityFormControls}
               onSubmit={handleCreate}
+              apiRes={
+                createMutation.isError ? createMutation.error.message
+                  : createMutation.isSuccess ? 'Producto creado correctamente'
+                    : null
+              }
+              apiResType={createMutation.isError ? 'error' : 'success'}
+              isSuccess={createMutation.isSuccess}
             />
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="ghost" onClick={() => setCreateModalOpen(false)}>Cancelar</Button>
-            <Button type="submit" form="create-product-form">Confirmar</Button>
+            <Button variant="ghost">Cancelar</Button>
+            <Button type="submit" form="create-product-form" loading={createMutation.isPending}>Confirmar</Button>
           </Modal.Footer>
         </Modal>
 
@@ -329,7 +271,7 @@ const ProductPage = () => {
           </Modal.Header>
           <Modal.Body>
             <EntityForm
-              controls={entityFormControls}
+              controls={[]}
               onSubmit={handleEdit}
               values={editingProduct ? { name: editingProduct.name, dsc: editingProduct.dsc, category_id: editingProduct.category_id } : undefined}
             />
@@ -340,17 +282,17 @@ const ProductPage = () => {
           </Modal.Footer>
         </Modal>
 
-        <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+        <Modal variant="danger" isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
           <Modal.Header title="Eliminar categoría" onClose={() => setDeleteModalOpen(false)} />
           <Modal.Body>
             <p className="modal-confirm-text">
-              ¿Seguro que querés eliminar la categoría <strong>{deletingProduct?.name}</strong>?
+              ¿Seguro que querés desactivar el producto <strong>{deletingProduct?.name}</strong>?
             </p>
-            <p className="modal-confirm-text">Esta acción no se puede deshacer.</p>
+            <p className="modal-confirm-text">No estará disponible para futuras cotizaciones hasta reactivarse.</p>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="ghost" onClick={() => setDeleteModalOpen(false)}>Cancelar</Button>
-            <Button danger onClick={handleDelete}>Eliminar</Button>
+            <Button variant="danger" onClick={handleDelete}>Desactivar</Button>
           </Modal.Footer>
         </Modal>
 
