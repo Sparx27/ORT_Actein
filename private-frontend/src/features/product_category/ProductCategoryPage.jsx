@@ -25,6 +25,7 @@ import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
 import { UI_CONFIG } from './config/uiConfig'
 import { API_FIELDS, FILTER_PARAMS } from './config/fieldsConfig'
+import useCreateCategory from './hooks/useCreateCategory'
 
 const CATEGORIES = [
   {
@@ -88,6 +89,7 @@ const { API_SEARCH } = API_FIELDS
 const ProductCategoryPage = () => {
   const { page, currentParams, setPage, setCurrentParams } = useCategoriesParams()
   const { categoriesQuery } = useCategories({ page, ...currentParams })
+  const [createModalOpen, setCreateModalOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState(null)
@@ -122,15 +124,20 @@ const ProductCategoryPage = () => {
   }
 
   // CREATE DATA
-  const btnHeaderList = [
-    {
-      label: 'Nueva Categoría',
-      icon: <SvgAdd />,
-      onClick: () => setModalOpen(true),
-      variant: 'primary'
-    }
-  ]
+  const btnHeaderList = UI_CONFIG.btnHeaderList(setCreateModalOpen)
 
+  const entityCreateFormControls = UI_CONFIG.formCreateControls()
+
+  const { createMutation } = useCreateCategory()
+
+  const handleCreate = (data) => {
+    console.log(data)
+    const body = {
+      name: data.c_name,
+      description: data.c_description || null
+    }
+    createMutation.mutate(body)
+  }
   // EDIT DATA
 
   // DELETE DATA
@@ -145,7 +152,7 @@ const ProductCategoryPage = () => {
   // Edit & Delete Actions
   const btnEntityActions = [
     {
-      icon: <SvgEdit />,
+      icon: () => <SvgEdit />,
       onClick: (row) => {
         const category = CATEGORIES.find(c => String(c.id) === String(row[0]))
         setEditingCategory(category)
@@ -153,7 +160,7 @@ const ProductCategoryPage = () => {
       }
     },
     {
-      icon: <SvgDelete />,
+      icon: () => <SvgDelete />,
       onClick: (row) => {
         const category = CATEGORIES.find(c => String(c.id) === String(row[0]))
         setDeletingCategory(category)
@@ -200,16 +207,27 @@ const ProductCategoryPage = () => {
           />
         </EntityPageContainer>
 
-        <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-          <Modal.Header title="Crear nueva categoría" onClose={() => setModalOpen(false)}>
+        <Modal isOpen={createModalOpen} onClose={() => setCreateModalOpen(false)}>
+          <Modal.Header title="Crear nueva categoría" onClose={() => setCreateModalOpen(false)}>
             <EntityFormHeader title={'Crear nueva categoría'} icon={<SvgTag />} />
           </Modal.Header>
           <Modal.Body>
-            {/* <EntityForm controls={entityFormControls} onSubmit={handleSubmit} /> */}
+            <EntityForm
+              formId="form-category-create"
+              controls={entityCreateFormControls}
+              onSubmit={handleCreate}
+              apiRes={
+                createMutation.isError ? createMutation.error.message
+                  : createMutation.isSuccess ? 'Categoría creada correctamente'
+                    : null
+              }
+              apiResType={createMutation.isError ? 'error' : 'success'}
+              isSuccess={createMutation.isSuccess}
+            />
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancelar</Button>
-            <Button type="submit" onClick={() => setModalOpen(false)}>Confirmar</Button>
+            <Button variant="ghost" onClick={() => setCreateModalOpen(false)}>Cancelar</Button>
+            <Button form="form-category-create" type="submit" loading={createMutation.isPending}>Confirmar</Button>
           </Modal.Footer>
         </Modal>
 

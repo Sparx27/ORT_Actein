@@ -9,3 +9,8 @@ export const getCategory = async (id) => {
   const { data } = await privateService.get(`/categories/${id}`)
   return data
 }
+
+export const postCategory = async (body) => {
+  const { data } = await privateService.post('/categories', body)
+  return data
+}
