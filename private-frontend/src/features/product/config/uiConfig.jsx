@@ -42,7 +42,7 @@ export const UI_CONFIG = {
   tableActions: (setEditingProduct, setEditModalOpen, setDeletingProduct, setDeleteModalOpen, PRODUCTS) => {
     return [
       {
-        icon: <SvgEdit />,
+        icon: () => <SvgEdit />,
         onClick: (row) => {
           const product = PRODUCTS.find(c => String(c.id) === String(row[0]))
           setEditingProduct(product)
