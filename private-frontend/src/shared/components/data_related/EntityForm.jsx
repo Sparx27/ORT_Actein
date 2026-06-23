@@ -16,7 +16,7 @@ const EntityForm = ({ onSubmit, apiRes, apiResType, controls = [], values, formI
   const { register, handleSubmit, formState: { errors }, control, reset } = useForm({ values })
 
   useEffect(() => {
-    if (isSuccess) reset()
+    if (isSuccess) console.log('Hola')
   }, [isSuccess, reset])
 
   return (
