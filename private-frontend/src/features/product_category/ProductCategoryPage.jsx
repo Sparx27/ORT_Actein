@@ -1,180 +1,199 @@
 import { useState } from 'react'
 import Breadcrumb from '../../layouts/components/Breadcrumb'
 import MainContentDisplay from '../../layouts/components/MainContentDisplay'
-import EntityFilters from '../../shared/components/data_related/EntityFilters'
-import EntityPageContainer from '../../shared/components/data_related/EntityPageContainer'
 import EntityPageHeader from '../../shared/components/data_related/EntityPageHeader'
-import EntityTable from '../../shared/components/data_related/EntityTable'
-import MessageBox from '../../shared/components/MessageBox'
-import MessageText from '../../shared/components/MessageText'
-import SvgAdd from '../../shared/components/svgs/SvgAdd'
-import SvgSearch from '../../shared/components/svgs/SvgSearch'
-import { entitiesToDataframe } from '../../shared/utils/entity_utils'
-import useCategories from './hooks/useCategories'
-import useCategoriesParams from './hooks/useCategoriesParams'
-import './product_category.css'
-import Modal from '../../shared/components/Modal'
-import EntityForm from '../../shared/components/data_related/EntityForm'
-import EntityFormHeader from '../../shared/components/data_related/EntityFormHeader'
-import SvgTag from '../../shared/components/svgs/SvgTag'
-import Button from '../../shared/components/Button'
-import SvgEdit from '../../shared/components/svgs/SvgEdit'
-import SvgDelete from '../../shared/components/svgs/SvgDelete'
-import EntityPagination from '../../shared/components/data_related/EntityPagination'
-import { useForm } from 'react-hook-form'
-import { useSearchParams } from 'react-router-dom'
+import useEntityParams from '../../shared/hooks/api_call/useEntityParams'
+import useGetEntities from '../../shared/hooks/api_call/useGetEntities'
+import { API_FIELDS, FILTER_PARAMS, URL_PARAMS } from './config/fieldsConfig'
 import { UI_CONFIG } from './config/uiConfig'
-import { API_FIELDS, FILTER_PARAMS } from './config/fieldsConfig'
-import useCreateCategory from './hooks/useCreateCategory'
+import { editCategory, getCategories, getCategory, postCategory, toggleCategory } from './services/queryCategory'
+import EntityPageContainer from '../../shared/components/data_related/EntityPageContainer'
+import Modal from '../../shared/components/Modal'
+import EntityFormHeader from '../../shared/components/data_related/EntityFormHeader'
+import SvgProducts from '../../shared/components/svgs/SvgProducts'
+import EntityForm from '../../shared/components/data_related/EntityForm'
+import Button from '../../shared/components/Button'
+import useEntityCreate from '../../shared/hooks/api_call/useEntityCreate'
+import useEntityForm from '../../shared/hooks/data_related/useEntityForm'
+import SvgTag from '../../shared/components/svgs/SvgTag'
+import EntityFilters from '../../shared/components/data_related/EntityFilters'
+import useEntityFilter from '../../shared/hooks/data_related/useEntityFilter'
+import EntityTable from '../../shared/components/data_related/EntityTable'
+import { entitiesToDataframe } from '../../shared/utils/entity_utils'
+import EntityPagination from '../../shared/components/data_related/EntityPagination'
+import useEntityToggleState from '../../shared/hooks/api_call/useEntityToggleState'
+import MessageBox from '../../shared/components/MessageBox'
+import useEntityGetById from '../../shared/hooks/api_call/useEntityGetById'
+import useEntityEdit from '../../shared/hooks/api_call/useEntityEdit'
 
-const CATEGORIES = [
-  {
-    id: 1,
-    name: 'Cat1',
-    dsc: 'Una dsc',
-    created: '1/1/2025 02:00:00'
-  },
-  {
-    id: 2,
-    name: 'Cat___2',
-    dsc: 'Una dsc de cat2 lorem efweagfyu egfywegfygwf wufwywfuywef wyf wefgywgfe uywg fge wfwf wufuywgfw fewfwfogwf uf wef wf wgfewufewy fw feu ffewufwgfewy fwug f',
-    created: '2/2/2025 02:00:00'
-  },
-  {
-    id: 3,
-    name: 'Cat3',
-    dsc: 'Descripción de la categoría 3',
-    created: '3/3/2025 02:00:00'
-  },
-  {
-    id: 4,
-    name: 'Cat4',
-    dsc: 'Descripción de la categoría 4 con un texto un poco más largo para pruebas',
-    created: '4/4/2025 02:00:00'
-  },
-  {
-    id: 5,
-    name: 'Cat5',
-    dsc: 'Categoría orientada a testing de componentes',
-    created: '5/5/2025 02:00:00'
-  },
-  {
-    id: 6,
-    name: 'Cat6',
-    dsc: 'Otra descripción de ejemplo para la categoría 6',
-    created: '6/6/2025 02:00:00'
-  },
-  {
-    id: 7,
-    name: 'Cat7',
-    dsc: 'Contenido descriptivo de la categoría 7',
-    created: '7/7/2025 02:00:00'
-  },
-  {
-    id: 8,
-    name: 'Cat8',
-    dsc: 'Texto de prueba para validar listados y tablas',
-    created: '8/8/2025 02:00:00'
-  },
-  {
-    id: 9,
-    name: 'Cat9',
-    dsc: 'Descripción breve de la categoría 9',
-    created: '9/9/2025 02:00:00'
-  }
-]
-
-const { API_SEARCH } = API_FIELDS
+const { URL_PAGE } = URL_PARAMS
+const { API_SEARCH, API_CATEGORY, API_BRAND, API_IS_ACTIVE, API_PAGE } = API_FIELDS
 
 const ProductCategoryPage = () => {
-  const { page, currentParams, setPage, setCurrentParams } = useCategoriesParams()
-  const { categoriesQuery } = useCategories({ page, ...currentParams })
-  const [createModalOpen, setCreateModalOpen] = useState(false)
-  const [modalOpen, setModalOpen] = useState(false)
+  const { page, currentParams, setPage, setCurrentParams } = useEntityParams(URL_PAGE, API_PAGE, FILTER_PARAMS)
+  const { entitiesQuery: categoriesQuery } = useGetEntities('categories', getCategories, { page, ...currentParams })
+
   const [editModalOpen, setEditModalOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState(null)
+  const [editingCategory, setEditingCategory] = useState(undefined)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [deletingCategory, setDeletingCategory] = useState(null)
-  const [searchParams] = useSearchParams()
-  const { register, handleSubmit, setValue, getValues } = useForm({
-    defaultValues: Object.fromEntries(
-      Object.entries(FILTER_PARAMS).map(
-        ([apiField, urlParam]) => [apiField, searchParams.get(urlParam) ?? '']
-      )
-    )
-  })
 
-  // FILTER DATA
-  const handleFilterSubmit = (data) => {
+  // GET PRODUCTS & TABLE ROWS AND BTNS
+  const apiData = categoriesQuery.data
+
+  function onClickEditBtn(categoryId) {
+    if (categoryId) {
+      setEditingCategory(categoryId)
+    }
+    setEditModalOpen(true)
+  }
+
+  function onClickToggleBtn(category) {
+    if (!category) category = []
+    toggleStateMutation.reset()
+    setDeletingCategory(category)
+    setDeleteModalOpen(true)
+  }
+
+  const btnEntityActions = UI_CONFIG.tableActions(
+    onClickEditBtn,
+    onClickToggleBtn)
+
+  const productsView = apiData?.categories
+
+  const productsDataframe = entitiesToDataframe(
+    UI_CONFIG.tableColumns,
+    productsView,
+    btnEntityActions
+  )
+  // END GET PRODUCTS & TABLE ROWS AND BTNS
+
+  // FILTER PRODUCTS
+  const {
+    register: filterRegister,
+    handleSubmit: filterHandleSubmit,
+    control: filterControl,
+    reset: filterReset } = useEntityFilter(FILTER_PARAMS)
+
+  const filterControls = UI_CONFIG.formFilterControls(filterControl)
+
+  function handleFilterSubmit(data) {
     setCurrentParams(data)
   }
 
-  const filterControls = [
-    {
-      type: 'text',
-      placeholder: 'Buscar por nombre',
-      icon: <SvgSearch w={15} h={15} />,
-      name: API_SEARCH
-    }
-  ]
-
-  const handleCleanFilters = () => {
-    Object.keys(FILTER_PARAMS).forEach(field => setValue(field, ''))
+  function handleCleanFilters() {
+    filterReset()
     setCurrentParams()
   }
+  // END FILTER PRODUCTS
 
-  // CREATE DATA
-  const btnHeaderList = UI_CONFIG.btnHeaderList(setCreateModalOpen)
+  // CREATE NEW CATEGORY
+  const { createMutation: createCategoryMutation } = useEntityCreate(postCategory, 'categories')
+  const {
+    register: createCategoryRegister,
+    control: createCategoryControl,
+    errors: createCategoryErrors,
+    submitHandler: createCategorySubmitHandler,
+    reset: createCategoryReset
+  } = useEntityForm({ isSuccess: createCategoryMutation.isSuccess, onSubmit: handleCreate })
 
-  const entityCreateFormControls = UI_CONFIG.formCreateControls()
+  const [createModalOpen, setCreateModalOpen] = useState(false)
 
-  const { createMutation } = useCreateCategory()
+  const createFormControls = UI_CONFIG.formCreateControls()
+  const btnHeaderList = UI_CONFIG.btnHeaderList(handleCreateOpenModal)
 
-  const handleCreate = (data) => {
-    console.log(data)
-    const body = {
+  function handleCreate(data) {
+    const reqBody = {
       name: data.c_name,
       description: data.c_description || null
     }
-    createMutation.mutate(body)
+    createCategoryMutation.mutate(reqBody)
   }
-  // EDIT DATA
 
-  // DELETE DATA
-  const handleConfirmDelete = () => {
-    console.log('eliminar', deletingCategory?.id)
+  function handleCreateOpenModal() {
+    createCategoryMutation.reset()
+    createCategoryReset()
+    setCreateModalOpen(true)
+  }
+
+  function handleCreateCloseModal() {
+    createCategoryMutation.reset()
+    createCategoryReset()
+    setCreateModalOpen(false)
+  }
+  // END CREATE NEW CATEGORY
+
+  // EDIT PRODUCT
+  const { entityByIdQuery: categoryByIdQuery } = useEntityGetById(
+    getCategory,
+    'category',
+    editingCategory
+  )
+  const { editMutation } = useEntityEdit(editCategory, 'categories', 'category')
+  const {
+    register: editRegister,
+    control: editControl,
+    errors: editErrors,
+    submitHandler: editSubmitHandler,
+    reset: editReset
+  } = useEntityForm({
+    values: categoryByIdQuery.data ? {
+      e_name: categoryByIdQuery.data.name ?? '',
+      e_description: categoryByIdQuery.data.description ?? ''
+    } : undefined,
+    isSuccess: editMutation.isSuccess,
+    onSubmit: handleEdit
+  })
+
+  const editFormControls = UI_CONFIG.formEditControls()
+
+  function handleEdit(data) {
+    const body = {
+      name: data.e_name,
+      description: data.e_description || null
+    }
+    editMutation.mutate({ id: editingCategory, body })
+  }
+
+  function handleEditOpenModal() {
+    editReset()
+    editMutation.reset()
+    setEditModalOpen(true)
+  }
+
+  function handleEditCloseModal() {
+    editReset()
+    editMutation.reset()
+    setEditModalOpen(false)
+  }
+  // END EDIT PRODUCT
+
+  // TOGGLE PRODUCT STATUS
+  const { toggleStateMutation } = useEntityToggleState(toggleCategory, 'categories')
+
+  function handleToggleState() {
+    if (!deletingCategory) {
+      handleCloseDeleteModal()
+      return
+    }
+    toggleStateMutation.mutate(
+      { id: deletingCategory[0], is_active: !deletingCategory[2] },
+      {
+        onSuccess: () => {
+          setDeletingCategory(null)
+          setDeleteModalOpen(false)
+        }
+      }
+    )
+  }
+
+  function handleCloseDeleteModal() {
+    toggleStateMutation.reset()
+    setDeletingCategory(null)
     setDeleteModalOpen(false)
   }
+  // END TOGGLE PRODUCT STATUS
 
-  // SHOW DATA
-  let apiData = categoriesQuery.data
-
-  // Edit & Delete Actions
-  const btnEntityActions = [
-    {
-      icon: () => <SvgEdit />,
-      onClick: (row) => {
-        const category = CATEGORIES.find(c => String(c.id) === String(row[0]))
-        setEditingCategory(category)
-        setEditModalOpen(true)
-      }
-    },
-    {
-      icon: () => <SvgDelete />,
-      onClick: (row) => {
-        const category = CATEGORIES.find(c => String(c.id) === String(row[0]))
-        setDeletingCategory(category)
-        setDeleteModalOpen(true)
-      },
-      danger: true
-    }
-  ]
-
-  const categoriesDataframe = entitiesToDataframe(
-    UI_CONFIG.tableColumns,
-    apiData?.categories,
-    btnEntityActions
-  )
 
   return (
     <>
@@ -182,24 +201,25 @@ const ProductCategoryPage = () => {
       <MainContentDisplay>
 
         <EntityPageHeader
-          title={'Categorías de producto'}
-          sub={'Para organizar los productos del catálogo por categoría'}
+          title={'Categorías'}
           btnList={btnHeaderList}
         />
 
         <EntityPageContainer>
           <EntityFilters
-            onSubmit={handleSubmit(handleFilterSubmit)}
-            register={register}
+            onSubmit={filterHandleSubmit(handleFilterSubmit)}
+            register={filterRegister}
             controls={filterControls}
             reset={handleCleanFilters}
           />
           <EntityTable
-            dataFrame={categoriesDataframe}
+            dataFrame={productsDataframe}
             isLoading={categoriesQuery.isLoading}
+            isFetching={categoriesQuery.isFetching}
             isError={categoriesQuery.error}
             errorMsg={categoriesQuery.error?.message ?? 'Error al cargar los datos, por favor intente nuevamente'}
           />
+
           <EntityPagination
             currentPage={page}
             totalPages={apiData?.total_pages ?? 1}
@@ -207,60 +227,104 @@ const ProductCategoryPage = () => {
           />
         </EntityPageContainer>
 
-        <Modal isOpen={createModalOpen} onClose={() => setCreateModalOpen(false)}>
-          <Modal.Header title="Crear nueva categoría" onClose={() => setCreateModalOpen(false)}>
-            <EntityFormHeader title={'Crear nueva categoría'} icon={<SvgTag />} />
+        {/* CREATE MODAL */}
+        <Modal isOpen={createModalOpen} onClose={handleCreateCloseModal}>
+          <Modal.Header onClose={handleCreateCloseModal}>
+            <EntityFormHeader title="Crear nueva categoría" icon={<SvgTag />} />
           </Modal.Header>
           <Modal.Body>
             <EntityForm
-              formId="form-category-create"
-              controls={entityCreateFormControls}
-              onSubmit={handleCreate}
+              formId="create-category-form"
+              controls={createFormControls}
+              register={createCategoryRegister}
+              control={createCategoryControl}
+              submitHandler={createCategorySubmitHandler}
+              errors={createCategoryErrors}
+              isSuccess={createCategoryMutation.isSuccess}
               apiRes={
-                createMutation.isError ? createMutation.error.message
-                  : createMutation.isSuccess ? 'Categoría creada correctamente'
+                createCategoryMutation.isError ? createCategoryMutation.error.message
+                  : createCategoryMutation.isSuccess ? 'Categoría creada correctamente'
                     : null
               }
-              apiResType={createMutation.isError ? 'error' : 'success'}
-              isSuccess={createMutation.isSuccess}
+              apiResType={createCategoryMutation.isError ? 'error' : 'success'}
             />
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="ghost" onClick={() => setCreateModalOpen(false)}>Cancelar</Button>
-            <Button form="form-category-create" type="submit" loading={createMutation.isPending}>Confirmar</Button>
+            <Button variant="ghost" onClick={handleCreateCloseModal}>Cancelar</Button>
+            <Button type="submit" form="create-category-form" loading={createCategoryMutation.isPending}>Confirmar</Button>
           </Modal.Footer>
         </Modal>
 
-        <Modal isOpen={editModalOpen} onClose={() => setEditModalOpen(false)}>
-          <Modal.Header onClose={() => setEditModalOpen(false)}>
-            <EntityFormHeader title="Editar categoría" icon={<SvgTag />} />
+        {/* EDIT MODAL */}
+        <Modal isOpen={editModalOpen} onClose={handleEditCloseModal}>
+          <Modal.Header onClose={handleEditCloseModal}>
+            <EntityFormHeader title="Editar categoría" icon={<SvgProducts />} />
           </Modal.Header>
           <Modal.Body>
-            {/* <EntityForm
-              controls={entityFormControls}
-              onSubmit={handleSubmit}
-              values={editingCategory ? { name: editingCategory.name, dsc: editingCategory.dsc } : undefined}
-            /> */}
+            <EntityForm
+              formId="edit-category-form"
+              controls={editFormControls}
+              register={editRegister}
+              control={editControl}
+              errors={editErrors}
+              submitHandler={editSubmitHandler}
+              isSuccess={editMutation.isSuccess}
+              apiRes={
+                editMutation.isError ?
+                  editMutation.error.message
+                  : editMutation.isSuccess ? 'Categoría actualizada correctamente'
+                    : null
+              }
+              apiResType={editMutation.isError ? 'error' : 'success'}
+              isLoadingData={categoryByIdQuery.isFetching}
+            />
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="ghost" onClick={() => setEditModalOpen(false)}>Cancelar</Button>
-            <Button onClick={() => setEditModalOpen(false)}>Confirmar</Button>
+            <Button variant="ghost" onClick={handleEditCloseModal}>Cancelar</Button>
+            <Button type="submit" form="edit-category-form"
+              loading={categoryByIdQuery.isFetching || editMutation.isPending}>Confirmar</Button>
           </Modal.Footer>
         </Modal>
 
-        <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
-          <Modal.Header title="Eliminar categoría" onClose={() => setDeleteModalOpen(false)} />
+        {/* TOGGLE STATUS MODAL */}
+        <Modal
+          variant={deletingCategory && (deletingCategory[2] ? 'danger' : '')}
+          isOpen={deleteModalOpen}
+          onClose={handleCloseDeleteModal}
+        >
+          <Modal.Header onClose={handleCloseDeleteModal}>
+            <EntityFormHeader title="Cambiar estado categoría" />
+          </Modal.Header>
           <Modal.Body>
-            <p className="modal-confirm-text">
-              ¿Seguro que querés eliminar la categoría <strong>{deletingCategory?.name}</strong>?
-            </p>
-            <p className="modal-confirm-text">Esta acción no se puede deshacer.</p>
+            {toggleStateMutation.isError && (
+              <div style={{ marginBottom: '15px' }}>
+                <MessageBox message={toggleStateMutation.error.message} type="error" />
+              </div>
+            )}
+            {deletingCategory && (
+              deletingCategory[2] ? (
+                <>
+                  <p className="modal-confirm-text">
+                    ¿Seguro que querés desactivar la categoría <strong>{deletingCategory && deletingCategory[1]}</strong>?
+                  </p>
+                </>
+              ) : (
+                <p className="modal-confirm-text">Activar categoría <strong>{deletingCategory && deletingCategory[1]}</strong>?</p>
+              )
+            )}
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="ghost" onClick={() => setDeleteModalOpen(false)}>Cancelar</Button>
-            <Button danger onClick={handleConfirmDelete}>Eliminar</Button>
+            <Button variant="ghost" onClick={handleCloseDeleteModal}>Cancelar</Button>
+            <Button
+              variant={deletingCategory && (deletingCategory[2] ? 'danger' : 'primary')}
+              onClick={handleToggleState}
+              loading={toggleStateMutation.isPending}
+            >
+              {deletingCategory && (deletingCategory[2] ? 'Desactivar' : 'Activar')}
+            </Button>
           </Modal.Footer>
         </Modal>
+
 
       </MainContentDisplay>
     </>

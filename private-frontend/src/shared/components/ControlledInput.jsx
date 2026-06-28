@@ -1,15 +1,18 @@
-const Input = ({
+const ControlledInput = ({
   label,
   icon,
   type = 'text',
   id,
+  name,
   placeholder,
   disabled = false,
   autoComplete = 'true',
   error = false,
   extraClass,
-  ref,        // ahora ref es un prop normal (React 19)
-  ...rest     // name, onChange, onBlur que vienen de register()
+  value = '',
+  onChange,
+  onBlur,
+  inputRef,
 }) => {
   return (
     <div className={extraClass ? `field ${extraClass}` : 'field'}>
@@ -24,13 +27,16 @@ const Input = ({
         {icon && <span className="input-icon">{icon}</span>}
 
         <input
-          ref={ref}
+          ref={inputRef}
           type={type}
           id={id}
+          name={name}
           placeholder={placeholder}
           disabled={disabled}
           autoComplete={autoComplete}
-          {...rest}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
         />
       </div>
 
@@ -39,4 +45,4 @@ const Input = ({
   )
 }
 
-export default Input
+export default ControlledInput

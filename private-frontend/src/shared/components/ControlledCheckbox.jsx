@@ -1,13 +1,15 @@
-import { forwardRef } from 'react'
-
-const Checkbox = forwardRef(({
+const ControlledCheckbox = ({
   label,
   id,
+  name,
   disabled,
   error,
   extraClass,
-  ...rest
-}, ref) => {
+  checked = false,
+  onChange,
+  onBlur,
+  inputRef,   // field.ref
+}) => {
   return (
     <div className={extraClass ? `field ${extraClass}` : 'field'}>
       <label className={[
@@ -17,11 +19,14 @@ const Checkbox = forwardRef(({
       ].filter(Boolean).join(' ')} htmlFor={id}>
 
         <input
-          ref={ref}
+          ref={inputRef}
           type="checkbox"
           id={id}
+          name={name}
           disabled={disabled}
-          {...rest}
+          checked={checked}
+          onChange={onChange}
+          onBlur={onBlur}
         />
 
         <span className="checkbox-box">
@@ -37,6 +42,6 @@ const Checkbox = forwardRef(({
       {error && <span className="field-error">{error}</span>}
     </div>
   )
-})
+}
 
-export default Checkbox
+export default ControlledCheckbox
