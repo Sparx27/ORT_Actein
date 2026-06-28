@@ -1,26 +1,26 @@
-import { Controller, useForm } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import Input from '../Input'
 import MessageBox from '../MessageBox'
 import TextArea from '../TextArea'
-import Modal from '../Modal'
-import Select from '../Select'
 import ComboBox from '../ComboBox'
 import CustomSelect from '../CustomSelect'
 import Checkbox from '../Checkbox'
-import { useEffect } from 'react'
+import ControlledTextArea from '../ControlledTextArea'
+import ControlledCheckbox from '../ControlledCheckbox'
 
-
-// useForm({ values }) → objeto con la forma { name: 'Cat1', dsc: 'Una dsc' }
-// Las keys tienen que coincidir con los name de los register)
-const EntityForm = ({ onSubmit, apiRes, apiResType, controls = [], values, formId, isSuccess }) => {
-  const { register, handleSubmit, formState: { errors }, control, reset } = useForm({ values })
-
-  useEffect(() => {
-    if (isSuccess) console.log('Hola')
-  }, [isSuccess, reset])
-
+const EntityForm = ({
+  formId,
+  controls = [],
+  apiRes,
+  apiResType,
+  register,
+  control,
+  errors,
+  submitHandler,
+  isLoadingData = false
+}) => {
   return (
-    <form id={formId} onSubmit={handleSubmit(onSubmit)}>
+    <form id={formId} onSubmit={submitHandler}>
 
       {apiRes && (
         <div style={{ marginBottom: '15px' }}>
@@ -29,19 +29,30 @@ const EntityForm = ({ onSubmit, apiRes, apiResType, controls = [], values, formI
       )}
 
       {controls?.length > 0 && (
-        controls.map((c, i) => {
+        controls.map((c) => {
           const { controlType } = c
-
           if (controlType === 'input') {
             return (
-              <div key={`econtrol${i}`} className="e-control-space">
-                <Input
-                  {...register(c.name, c.validations)}
-                  label={c.label}
-                  type={c.type}
-                  id={c.name}
-                  autoComplete="true"
-                  error={errors[c.name]?.message}
+              <div key={c.name} className="e-control-space">
+                <Controller
+                  name={c.name}
+                  control={control}
+                  rules={c.validations}
+                  render={({ field, fieldState }) => (
+                    <Input
+                      label={c.label}
+                      type={c.type}
+                      id={c.name}
+                      name={field.name}
+                      autoComplete="true"
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      inputRef={field.ref}
+                      error={fieldState.error?.message}
+                      disabled={isLoadingData}
+                    />
+                  )}
                 />
               </div>
             )
@@ -49,23 +60,35 @@ const EntityForm = ({ onSubmit, apiRes, apiResType, controls = [], values, formI
 
           if (controlType === 'textarea') {
             return (
-              <div key={`econtrol${i}`} className="e-control-space">
-                <TextArea
-                  label={c.label}
-                  id={c.name}
-                  {...register(c.name, c.validations)}
-                  error={errors[c.name]?.message}
+              <div key={c.name} className="e-control-space">
+                <Controller
+                  name={c.name}
+                  control={control}
+                  rules={c.validations}
+                  render={({ field, fieldState }) => (
+                    <ControlledTextArea
+                      label={c.label}
+                      id={c.name}
+                      name={field.name}
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      inputRef={field.ref}
+                      error={fieldState.error?.message}
+                      disabled={isLoadingData}
+                    />
+                  )}
                 />
               </div>
             )
           }
 
-          if (c.type === 'select') {
+          if (controlType === 'select') {
             return (
-              <div key={`econtrol${i}`} className="e-control-space">
+              <div key={c.name} className="e-control-space">
                 <Controller
                   name={c.name}
-                  control={c.control}
+                  control={control}
                   rules={c.validations}
                   render={({ field, fieldState }) => (
                     <CustomSelect
@@ -77,6 +100,7 @@ const EntityForm = ({ onSubmit, apiRes, apiResType, controls = [], values, formI
                       onChange={field.onChange}
                       extraClass={'data-filters-options'}
                       error={fieldState.error?.message}
+                      disabled={isLoadingData}
                     />
                   )}
                 />
@@ -86,13 +110,25 @@ const EntityForm = ({ onSubmit, apiRes, apiResType, controls = [], values, formI
 
           if (controlType === 'checkbox') {
             return (
-              <div key={`econtrol${i}`} className="e-control-space">
-                <Checkbox
-                  label={c.label}
-                  id={c.name}
-                  extraClass={'data-filters-options'}
-                  {...register(c.name, c.validations)}
-                  error={errors[c.name]?.message}
+              <div key={c.name} className="e-control-space">
+                <Controller
+                  name={c.name}
+                  control={control}
+                  rules={c.validations}
+                  render={({ field, fieldState }) => (
+                    <ControlledCheckbox
+                      label={c.label}
+                      id={c.name}
+                      name={field.name}
+                      extraClass={'data-filters-options'}
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      onBlur={field.onBlur}
+                      inputRef={field.ref}
+                      error={fieldState.error?.message}
+                      disabled={isLoadingData}
+                    />
+                  )}
                 />
               </div>
             )
@@ -100,7 +136,7 @@ const EntityForm = ({ onSubmit, apiRes, apiResType, controls = [], values, formI
 
           if (controlType === 'combobox') {
             return (
-              <div key={`econtrol${i}`} className="e-control-space">
+              <div key={c.name} className="e-control-space">
                 <Controller
                   name={c.name}
                   control={control}
@@ -114,12 +150,15 @@ const EntityForm = ({ onSubmit, apiRes, apiResType, controls = [], values, formI
                       value={field.value}
                       onChange={field.onChange}
                       error={fieldState.error?.message}
+                      disabled={isLoadingData}
                     />
                   )}
                 />
               </div>
             )
           }
+
+          return null
         })
       )}
 
