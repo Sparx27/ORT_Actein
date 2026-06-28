@@ -38,7 +38,7 @@ def test_get_products_returns_correct_structure(mock_products, mock_count, mock_
     mock_categories.return_value = fake_categories
     mock_brands.return_value = fake_brands
 
-    result = svc_get_products(db, page=1, search=None, category_id=None, brand=None)
+    result = svc_get_products(db, page=1, search=None, category_id=None, brand=None, requires_installation=None)
 
     assert result['products'] == fake_products
     assert result['total_products'] == 25
@@ -60,9 +60,9 @@ def test_get_products_calculates_offset_correctly(mock_products, mock_count, moc
     mock_categories.return_value = []
     mock_brands.return_value = []
 
-    svc_get_products(db, page=3, search=None, category_id=None, brand=None)
+    svc_get_products(db, page=3, search=None, category_id=None, brand=None, requires_installation=None)
 
-    _, _, limit, offset, _, _ = mock_products.call_args[0]
+    _, _, limit, offset, _, _, _ = mock_products.call_args[0]
     assert offset == (3 - 1) * LIMIT
     assert limit == LIMIT
 
@@ -79,7 +79,7 @@ def test_get_products_total_pages_minimum_one_when_no_products(mock_products, mo
     mock_categories.return_value = []
     mock_brands.return_value = []
 
-    result = svc_get_products(db, page=1, search=None, category_id=None, brand=None)
+    result = svc_get_products(db, page=1, search=None, category_id=None, brand=None, requires_installation=None)
 
     assert result['total_pages'] == 1
 
@@ -96,7 +96,7 @@ def test_get_products_total_pages_with_150_products(mock_products, mock_count, m
     mock_categories.return_value = []
     mock_brands.return_value = []
 
-    result = svc_get_products(db, page=1, search=None, category_id=None, brand=None)
+    result = svc_get_products(db, page=1, search=None, category_id=None, brand=None, requires_installation=None)
 
     assert result['total_products'] == 150
     assert result['total_pages'] == math.ceil(150 / LIMIT)  # 13
@@ -114,7 +114,7 @@ def test_get_products_total_pages_exact_multiple_of_limit(mock_products, mock_co
     mock_categories.return_value = []
     mock_brands.return_value = []
 
-    result = svc_get_products(db, page=1, search=None, category_id=None, brand=None)
+    result = svc_get_products(db, page=1, search=None, category_id=None, brand=None, requires_installation=None)
 
     assert result['total_pages'] == 10
 
@@ -131,7 +131,7 @@ def test_get_products_last_page_with_partial_results(mock_products, mock_count, 
     mock_categories.return_value = []
     mock_brands.return_value = []
 
-    result = svc_get_products(db, page=13, search=None, category_id=None, brand=None)
+    result = svc_get_products(db, page=13, search=None, category_id=None, brand=None, requires_installation=None)
 
     assert result['page'] == 13
     assert result['total_pages'] == 13
@@ -148,9 +148,28 @@ def test_get_products_raises_500_on_db_error(mock_products, mock_count, mock_cat
     mock_products.side_effect = SQLAlchemyError()
 
     with pytest.raises(HTTPException) as exc:
-        svc_get_products(db, page=1, search=None, category_id=None, brand=None)
+        svc_get_products(db, page=1, search=None, category_id=None, brand=None, requires_installation=None)
 
     assert exc.value.status_code == 500
+
+
+@patch('app.services.svc_product.rep_get_brands')
+@patch('app.services.svc_product.rep_get_categories_with_products')
+@patch('app.services.svc_product.rep_count_products')
+@patch('app.services.svc_product.rep_get_products')
+def test_get_products_forwards_requires_installation_to_repo(mock_products, mock_count, mock_categories, mock_brands):
+    """El filtro requires_installation se reenvía al repo en la posición esperada"""
+    db = MagicMock()
+    mock_products.return_value = []
+    mock_count.return_value = 0
+    mock_categories.return_value = []
+    mock_brands.return_value = []
+
+    svc_get_products(db, page=1, search=None, category_id=None, brand=None, requires_installation=True)
+
+    # rep_get_products(db, search, LIMIT, offset, category_id, brand, requires_installation)
+    args = mock_products.call_args[0]
+    assert args[6] is True
 
 
 # ─── svc_get_product_by_id ────────────────────────────────────────────────────

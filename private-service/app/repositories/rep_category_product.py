@@ -6,15 +6,18 @@ from app.models.mod_category_product import CategoryProduct
 _IS_ACTIVE = CategoryProduct.is_active.is_(True)
 
 
-def _build_search_filter(search: str | None) -> list:
-    if not search:
-        return []
-    clean_search = search.strip().lower()
-    return [or_(CategoryProduct.name.ilike(f'%{clean_search}%'), CategoryProduct.description.ilike(f'%{clean_search}%'))]
+def _build_search_filter(search: str | None, is_active: bool | None) -> list:
+    filters = []
+    if is_active is not None:
+        filters.append(CategoryProduct.is_active == is_active)
+    if search:
+        clean_search = search.strip().lower()
+        filters.append(or_(CategoryProduct.name.ilike(f'%{clean_search}%'), CategoryProduct.description.ilike(f'%{clean_search}%')))
+    return filters
 
 
-def rep_get_categories(db: Session, search: str | None, limit: int, offset: int):
-    filters_ = _build_search_filter(search)
+def rep_get_categories(db: Session, search: str | None, limit: int, offset: int, is_active: bool | None):
+    filters_ = _build_search_filter(search, is_active)
     query = select(CategoryProduct).where(*filters_).order_by(CategoryProduct.id).limit(limit).offset(offset)
     return db.execute(query).scalars().all()
 
@@ -24,12 +27,8 @@ def rep_get_categories_id_name(db: Session):
     return db.execute(query).all()
 
 
-def rep_count_categories(
-    db: Session,
-    search: str | None,
-) -> int:
-    filters_ = _build_search_filter(search)
-
+def rep_count_categories(db: Session, search: str | None, is_active: bool | None) -> int:
+    filters_ = _build_search_filter(search, is_active)
     query = select(func.count()).select_from(CategoryProduct).where(*filters_)
     return db.execute(query).scalar()
 
