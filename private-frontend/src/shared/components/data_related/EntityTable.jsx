@@ -17,7 +17,7 @@ dataFrame = {
   ]
 }
 */
-const EntityTable = ({ dataFrame = {}, isLoading, isError, errorMsg }) => {
+const EntityTable = ({ dataFrame = {}, isLoading, isFetching, isError, errorMsg }) => {
   const { headers, rows, actions, renders } = dataFrame
 
   // Para cuando hay error o esta cargando, que la primera row ocupe toda la tabla...
@@ -56,31 +56,40 @@ const EntityTable = ({ dataFrame = {}, isLoading, isError, errorMsg }) => {
                   </td>
                 </tr>
               ) : (
-                rows?.length > 0 && (
-                  rows.map((r, i) => (
-                    <tr key={`tr-${i}`}>
-                      {r.map((v, ii) => (
-                        <td key={`td-${i}-${ii}`} className={ii === 0 ? 'col-id' : ''}>
-                          {renders?.[ii] ? renders[ii](v, r) : v}
-                        </td>
-                      ))}
-                      {actions?.length > 0 && (
-                        <td className="col-actions">
-                          <div className="row-actions">
-                            {actions.map((btn, bi) => (
-                              <ButtonIcon
-                                key={`btn-${i}-${bi}`}
-                                onClick={() => btn.onClick(r, i)}
-                                icon={btn.icon}
-                                danger={btn.danger ? true : false}
-                              />
-                            ))}
-                          </div>
-                        </td>
-                      )}
-                    </tr>
-                  ))
-                )
+                <>
+                  {isFetching && <tr>
+                    <td colSpan={totalSpan}>
+                      <div className="data-table-message">
+                        <MessageText message="Actualizando información..." type="info" />
+                      </div>
+                    </td>
+                  </tr>}
+                  {rows?.length > 0 && (
+                    rows.map((r, i) => (
+                      <tr key={`tr-${i}`}>
+                        {r.map((v, ii) => (
+                          <td key={`td-${i}-${ii}`} className={ii === 0 ? 'col-id' : ''}>
+                            {renders?.[ii] ? renders[ii](v, r) : v}
+                          </td>
+                        ))}
+                        {actions?.length > 0 && (
+                          <td className="col-actions">
+                            <div className="row-actions">
+                              {actions.map((btn, bi) => (
+                                <ButtonIcon
+                                  key={`btn-${i}-${bi}`}
+                                  onClick={() => btn.onClick(r, i)}
+                                  icon={btn.icon()}
+                                  danger={btn.danger ? true : false}
+                                />
+                              ))}
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    ))
+                  )}
+                </>
               )}
             </tbody>
 

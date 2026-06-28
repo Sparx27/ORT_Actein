@@ -14,18 +14,21 @@ const LoginContentRight = () => {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  // useMutation maneja una acción que modifica algo (acá: autenticar).
-  // - mutationFn: la función async que hace el trabajo (la llamada al login)
   const mutation = useMutation({
     mutationFn: loginQuery,
     onSuccess: (data) => {
       login(data.access_token)  // guarda el token en contexto + localStorage
-      navigate('/', { replace: true })  // redirige al home
+      navigate('/', { replace: true })
+    },
+    onError: (error) => {
+      if (error.status === 401) {
+        window.location.reload()
+      }
     }
   })
 
   const onSubmit = (data) => {
-    mutation.mutate(data)  // dispara la mutación con { email, password }
+    mutation.mutate(data)
   }
 
   return (

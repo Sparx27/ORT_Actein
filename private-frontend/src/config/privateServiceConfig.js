@@ -11,7 +11,12 @@ authService.interceptors.response.use(
   (res) => res,
   (error) => {
     const message = error.response?.data?.detail ?? 'Error de conexión, intente nuevamente más tarde'
-    return Promise.reject(new Error(message))
+    const err = new Error(message)
+    err.status = error.response?.status
+    if (err.status === 401) {
+      removeToken()
+    }
+    return Promise.reject(err)
   }
 )
 
@@ -30,7 +35,7 @@ privateService.interceptors.response.use(
   (res) => res,
   (error) => {
     const message = error.response?.data?.detail ?? 'Error de conexión, intente nuevamente más tarde'
-    if (error.status === 401) {
+    if (error.response?.status === 401) {
       removeToken()
       window.location.href = '/ingresar'
     }

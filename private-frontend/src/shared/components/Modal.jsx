@@ -28,7 +28,7 @@ EJEMPLO DE USO:
 </>
 */
 
-function Modal({ isOpen, onClose, children }) {
+function Modal({ isOpen, onClose, children, variant }) {
   const overlayRef = useRef(null)
   useEffect(() => {
     if (!isOpen) return
@@ -52,7 +52,7 @@ function Modal({ isOpen, onClose, children }) {
       ref={overlayRef}
       onClick={handleOverlayClick}
     >
-      <div className="modal-box">
+      <div className={`modal-box ${variant === 'danger' ? 'modal-danger' : ''}`}>
         {children}
       </div>
     </div>
