@@ -23,8 +23,13 @@ category_router = APIRouter(dependencies=[Depends(security)])
 
 
 @category_router.get('/categories', response_model=SchCategoryPaginated)
-def get_categories(db: Session = Depends(get_db), page: int = Query(default=1, ge=1), search: str | None = Query(default=None)):
-    return svc_get_categories(db, page, search)
+def get_categories(
+    db: Session = Depends(get_db),
+    page: int = Query(default=1, ge=1),
+    search: str | None = Query(default=None),
+    is_active: bool | None = Query(default=None),
+):
+    return svc_get_categories(db, page, search, is_active)
 
 
 @category_router.get('/categories/options', response_model=list[SchCategory])
