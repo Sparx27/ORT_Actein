@@ -1,17 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { postProduct } from '../services/queryProduct'
 
-const useCreateProduct = () => {
+const useEntityCreate = (mFn, qKey) => {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation({
-    mutationFn: postProduct,
+    mutationFn: mFn,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: [qKey] })
     }
   })
 
   return { createMutation }
 }
 
-export default useCreateProduct
+export default useEntityCreate
