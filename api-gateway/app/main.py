@@ -1,19 +1,39 @@
 import httpx
 from fastapi import FastAPI, Request
-from fastapi.responses import Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, Response
 
 from app.auth.auth_middleware import AuthMiddleware
 from app.config.settings import settings
 
 app = FastAPI(title='Actein API Gateway')
+
 app.add_middleware(AuthMiddleware)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
 
 
 async def proxy(request: Request, target_url: str, path: str):
     async with httpx.AsyncClient() as client:
         url = f'{target_url}/{path}'
+        try:
+            response = await client.request(
+                method=request.method,
+                url=url,
+                params=request.query_params,
+                headers=dict(request.headers),
+                content=await request.body(),
+            )
+        except httpx.TimeoutException:
+            return JSONResponse(status_code=504, content={'detail': 'El servicio tardó demasiado en responder'})
+        except httpx.RequestError:
+            return JSONResponse(status_code=502, content={'detail': 'El servicio no está disponible'})
 
-        response = await client.request(method=request.method, url=url, headers=dict(request.headers), content=await request.body())
         return Response(content=response.content, status_code=response.status_code, headers=dict(response.headers))
 
 

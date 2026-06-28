@@ -2,7 +2,7 @@ import bcrypt
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.auth.auth_handler import create_token
+from app.auth.auth_handler import create_token, verify_token
 from app.models.mod_app_user import AppUser
 from app.repositories.rep_user_app import rep_get_user_by_email
 
@@ -27,3 +27,7 @@ def _verify_password(password: str, password_hash: str):
 def _verify_active(app_user: AppUser):
     if not app_user.is_active:
         raise HTTPException(status_code=401, detail='Credenciales inválidas')
+
+
+def svc_validate_session(token: str) -> dict:
+    return verify_token(token)
