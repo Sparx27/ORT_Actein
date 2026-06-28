@@ -19,11 +19,11 @@ from app.shared.utl_validators import validate_exists
 LIMIT = 12
 
 
-def svc_get_categories(db: Session, page: int, search: str | None):
+def svc_get_categories(db: Session, page: int, search: str | None, is_active: bool | None):
     try:
         offset = (page - 1) * LIMIT
-        categories = rep_get_categories(db, search, LIMIT, offset)
-        total_categories = rep_count_categories(db, search)
+        categories = rep_get_categories(db, search, LIMIT, offset, is_active)
+        total_categories = rep_count_categories(db, search, is_active)
         return build_pagination(categories, total_categories, page, LIMIT, 'categories')
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail='Error al obtener las categorías')
