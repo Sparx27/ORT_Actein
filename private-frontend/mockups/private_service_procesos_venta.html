@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Procesos de Venta — Sistema Interno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:        #0c1f3d;
+  --navy-light:  #1a3256;
+  --navy-hover:  #243f6b;
+  --teal:        #0e7490;
+  --teal-hover:  #0c6478;
+  --teal-bg:     #ecfeff;
+  --white:       #ffffff;
+  --gray-50:     #f8fafc;
+  --gray-100:    #f1f5f9;
+  --gray-200:    #e2e8f0;
+  --gray-300:    #cbd5e1;
+  --gray-400:    #94a3b8;
+  --gray-500:    #64748b;
+  --gray-700:    #334155;
+  --gray-900:    #0f172a;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.08);
+  --sidebar-w:   228px;
+  --topbar-h:    56px;
+  --font-main:   'Inter', system-ui, sans-serif;
+  --font-head:   'Sora', system-ui, sans-serif;
+}
+
+html, body { height: 100%; }
+body {
+  font-family: var(--font-main);
+  background: var(--gray-50);
+  color: var(--gray-900);
+  font-size: 14px;
+  line-height: 1.5;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--navy);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  z-index: 50;
+  overflow-y: auto;
+}
+.sidebar-brand {
+  padding: 0 20px;
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.brand-icon {
+  width: 30px; height: 30px;
+  background: #38bdf8;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.brand-name {
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
+}
+.brand-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  font-weight: 400;
+  font-family: var(--font-main);
+}
+
+.nav-section {
+  padding: 20px 12px 8px;
+}
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  color: rgba(255,255,255,0.6);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  text-decoration: none;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+.nav-item.active { background: rgba(14,116,144,0.35); color: #fff; }
+.nav-item.active .nav-icon { color: #38bdf8; }
+.nav-icon { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.8; }
+.nav-item.active .nav-icon { opacity: 1; }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.user-card:hover { background: rgba(255,255,255,0.07); }
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: #1a3256;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: #38bdf8;
+  flex-shrink: 0;
+}
+.user-info { min-width: 0; }
+.user-name { font-size: 13px; font-weight: 500; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+/* ── MAIN ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--gray-400);
+}
+.breadcrumb span { color: var(--gray-700); font-weight: 500; }
+.breadcrumb-sep { color: var(--gray-300); }
+
+/* ── PAGE CONTENT ── */
+.page-content {
+  padding: 28px;
+  flex: 1;
+}
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.page-title h1 {
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 3px;
+}
+.page-title p {
+  font-size: 13px;
+  color: var(--gray-400);
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 18px;
+  background: var(--teal);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: background 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-primary:hover { background: var(--teal-hover); }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+}
+.filter-bar-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+.filter-select {
+  height: 34px;
+  padding: 0 28px 0 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: var(--gray-50);
+  color: var(--gray-700);
+  font-size: 13px;
+  font-family: var(--font-main);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color 0.15s;
+}
+.filter-select:focus { border-color: var(--teal); outline: none; }
+.filter-divider { width: 1px; height: 20px; background: var(--gray-200); }
+.results-label { font-size: 13px; color: var(--gray-400); margin-left: auto; white-space: nowrap; }
+.results-label strong { color: var(--gray-700); font-weight: 600; }
+
+/* ── TABLE ── */
+.table-wrap {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+thead {
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+}
+thead th {
+  text-align: left;
+  padding: 11px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid var(--gray-100);
+  transition: background 0.1s;
+  cursor: pointer;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--gray-50); }
+tbody td {
+  padding: 13px 16px;
+  color: var(--gray-700);
+  vertical-align: middle;
+}
+.td-main { color: var(--gray-900); font-weight: 500; }
+.td-sub  { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.td-id   { font-size: 12px; color: var(--gray-400); font-family: monospace; }
+
+/* ── SORTABLE HEADERS ── */
+.th-sort {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+.th-sort:hover { color: var(--teal); }
+.sort-icon { font-size: 10px; margin-left: 3px; opacity: 0.6; }
+
+/* ── STATUS BADGE ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+/* State colors */
+.s-nuevo     { background: #dbeafe; color: #1e40af; } .s-nuevo .badge-dot     { background: #3b82f6; }
+.s-cotizando { background: #fef9c3; color: #854d0e; } .s-cotizando .badge-dot { background: #eab308; }
+.s-enviada   { background: #ffedd5; color: #9a3412; } .s-enviada .badge-dot   { background: #f97316; }
+.s-confirmada{ background: #dcfce7; color: #14532d; } .s-confirmada .badge-dot{ background: #22c55e; }
+.s-proveedor { background: #f3e8ff; color: #6b21a8; } .s-proveedor .badge-dot { background: #a855f7; }
+.s-esperando { background: #ccfbf1; color: #134e4a; } .s-esperando .badge-dot { background: #14b8a6; }
+.s-entrega   { background: #cffafe; color: #164e63; } .s-entrega .badge-dot   { background: #06b6d4; }
+.s-instalacion{background: #e0e7ff; color: #3730a3; } .s-instalacion .badge-dot{background: #6366f1;}
+.s-facturado { background: #d1fae5; color: #065f46; } .s-facturado .badge-dot { background: #10b981; }
+.s-cerrado   { background: #f1f5f9; color: #475569; } .s-cerrado .badge-dot   { background: #94a3b8; }
+.s-perdida   { background: #fee2e2; color: #991b1b; } .s-perdida .badge-dot   { background: #ef4444; }
+
+/* ── ROW ACTIONS ── */
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+tbody tr:hover .row-actions { opacity: 1; }
+.btn-icon {
+  width: 30px; height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--gray-500);
+  transition: background 0.12s, color 0.12s;
+}
+.btn-icon:hover { background: var(--teal-bg); color: var(--teal); border-color: var(--teal); }
+
+/* ── EMPTY STATE ── */
+.empty-row td {
+  text-align: center;
+  padding: 56px 24px;
+  color: var(--gray-400);
+}
+.empty-row td svg { display: block; margin: 0 auto 12px; opacity: 0.2; }
+.empty-row td p { font-size: 14px; }
+
+/* ── PAGINATION ── */
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-top: 1px solid var(--gray-100);
+  background: var(--gray-50);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.page-info { font-size: 12px; color: var(--gray-400); }
+.pagination { display: flex; align-items: center; gap: 3px; }
+.page-btn {
+  min-width: 32px; height: 32px; padding: 0 8px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  color: var(--gray-700);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; font-family: var(--font-main);
+  transition: all 0.12s;
+  display: flex; align-items: center; justify-content: center;
+}
+.page-btn:hover:not(:disabled) { background: var(--gray-50); border-color: var(--gray-300); }
+.page-btn.active { background: var(--teal); color: white; border-color: var(--teal); }
+.page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── STAT CARDS ── */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+}
+.stat-label { font-size: 12px; color: var(--gray-400); font-weight: 500; margin-bottom: 6px; }
+.stat-value { font-size: 24px; font-weight: 700; color: var(--gray-900); font-family: var(--font-head); line-height: 1; margin-bottom: 4px; }
+.stat-sub   { font-size: 11px; color: var(--gray-400); }
+.stat-dot   { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .stat-row { grid-template-columns: repeat(2, 1fr); }
+  .col-empleado, .col-descripcion { display: none; }
+}
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main    { margin-left: 0; }
+  .stat-row { grid-template-columns: repeat(2, 1fr); }
+  .page-content { padding: 16px; }
+  .topbar { padding: 0 16px; }
+  .filter-bar { gap: 8px; }
+  .col-contacto { display: none; }
+}
+@media (max-width: 480px) {
+  .stat-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-value { font-size: 20px; }
+  .filter-select { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0c1f3d" stroke-width="2.2">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">Sistema Interno</div>
+      <div class="brand-sub">Gestión comercial</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Principal</div>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Inicio
+    </a>
+    <a class="nav-item active" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Procesos de venta
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Empresas
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Contactos
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Catálogo</div>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Productos
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>
+      Servicios
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Operativo</div>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+      Mantenimiento
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">CG</div>
+      <div class="user-info">
+        <div class="user-name">Cristian García</div>
+        <div class="user-role">Administrativo</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="breadcrumb">
+      Inicio
+      <span class="breadcrumb-sep">›</span>
+      <span>Procesos de venta</span>
+    </div>
+  </div>
+
+  <!-- PAGE CONTENT -->
+  <div class="page-content">
+
+    <div class="page-header">
+      <div class="page-title">
+        <h1>Procesos de venta</h1>
+        <p>Seguimiento del ciclo comercial completo</p>
+      </div>
+      <button class="btn-primary" onclick="openNewModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nuevo proceso
+      </button>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-label">Total activos</div>
+        <div class="stat-value" id="statActivos">—</div>
+        <div class="stat-sub">procesos en curso</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Nuevos contactos</div>
+        <div class="stat-value" id="statNuevos">—</div>
+        <div class="stat-sub"><span class="stat-dot" style="background:#3b82f6"></span>sin gestión aún</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">En cotización</div>
+        <div class="stat-value" id="statCotizando">—</div>
+        <div class="stat-sub"><span class="stat-dot" style="background:#eab308"></span>cotizando / enviada</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Perdidos</div>
+        <div class="stat-value" id="statPerdidos">—</div>
+        <div class="stat-sub"><span class="stat-dot" style="background:#ef4444"></span>este período</div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <span class="filter-bar-label">Filtrar por</span>
+      <select class="filter-select" id="filterEstado" onchange="applyFilter()">
+        <option value="">Todos los estados</option>
+        <option value="NUEVO_CONTACTO">Nuevo contacto</option>
+        <option value="COTIZANDO">Cotizando</option>
+        <option value="COTIZACION_ENVIADA">Cotización enviada</option>
+        <option value="VENTA_CONFIRMADA">Venta confirmada</option>
+        <option value="CONTACTO_PROVEEDOR">Contacto proveedor</option>
+        <option value="ESPERANDO_EQUIPO">Esperando equipo</option>
+        <option value="EN_ENTREGA">En entrega</option>
+        <option value="EN_INSTALACION">En instalación</option>
+        <option value="FACTURADO">Facturado</option>
+        <option value="CERRADO">Cerrado</option>
+        <option value="PERDIDA">Perdida</option>
+      </select>
+      <div class="filter-divider"></div>
+      <span class="results-label">Mostrando <strong id="countLabel">—</strong> proceso(s)</span>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:64px;">#</th>
+            <th>Empresa</th>
+            <th class="col-contacto">Contacto</th>
+            <th>Estado</th>
+            <th class="col-empleado">Responsable</th>
+            <th class="th-sort" onclick="toggleSort('fecha')" id="th-fecha">Primer contacto <span class="sort-icon" id="si-fecha">↕</span></th>
+            <th class="th-sort" onclick="toggleSort('actualizacion')" id="th-actualizacion">Últ. actualización <span class="sort-icon" id="si-actualizacion">↓</span></th>
+            <th style="width:80px;"></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="table-footer">
+        <div class="page-info" id="pageInfo">—</div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+  </div><!-- /page-content -->
+</div><!-- /main -->
+
+<script>
+const ESTADOS = {
+  NUEVO_CONTACTO:    { label:'Nuevo contacto',    cls:'s-nuevo' },
+  COTIZANDO:         { label:'Cotizando',          cls:'s-cotizando' },
+  COTIZACION_ENVIADA:{ label:'Cotización enviada', cls:'s-enviada' },
+  VENTA_CONFIRMADA:  { label:'Venta confirmada',   cls:'s-confirmada' },
+  CONTACTO_PROVEEDOR:{ label:'Contacto proveedor', cls:'s-proveedor' },
+  ESPERANDO_EQUIPO:  { label:'Esperando equipo',   cls:'s-esperando' },
+  EN_ENTREGA:        { label:'En entrega',         cls:'s-entrega' },
+  EN_INSTALACION:    { label:'En instalación',     cls:'s-instalacion' },
+  FACTURADO:         { label:'Facturado',          cls:'s-facturado' },
+  CERRADO:           { label:'Cerrado',            cls:'s-cerrado' },
+  PERDIDA:           { label:'Perdida',            cls:'s-perdida' },
+};
+
+const PROCESOS = [
+  { id:'PV-001', empresa:'Supermercado El Dorado', contacto:'Marcelo Ríos',  empleado:'Cristian G.', estado:'COTIZANDO',           fecha:'2026-04-03', actualizacion:'2026-04-09', desc:'Cámara de conservación + exhibidoras' },
+  { id:'PV-002', empresa:'Frigorífico Norte S.A.', contacto:'Ana Martínez',  empleado:'Nicolás G.',  estado:'VENTA_CONFIRMADA',    fecha:'2026-04-01', actualizacion:'2026-04-08', desc:'Unidad condensadora 8HP' },
+  { id:'PV-003', empresa:'—',                      contacto:'Jorge Peña',    empleado:'Cristian G.', estado:'NUEVO_CONTACTO',      fecha:'2026-04-07', actualizacion:'2026-04-07', desc:'Consulta inicial sin empresa asignada' },
+  { id:'PV-004', empresa:'Resto La Pergola',       contacto:'Sofía Duarte',  empleado:'Nicolás G.',  estado:'COTIZACION_ENVIADA',  fecha:'2026-03-28', actualizacion:'2026-04-05', desc:'Exhibidora vertical + instalación' },
+  { id:'PV-005', empresa:'Hotel Esplendor',        contacto:'Carlos Vidal',  empleado:'Cristian G.', estado:'ESPERANDO_EQUIPO',    fecha:'2026-03-15', actualizacion:'2026-04-02', desc:'Cámara frigorífica modular BHT-20' },
+  { id:'PV-006', empresa:'Carnicería San Jorge',   contacto:'Luis Benítez',  empleado:'Nicolás G.',  estado:'EN_ENTREGA',          fecha:'2026-03-10', actualizacion:'2026-04-06', desc:'Cámara congelación BHF-08' },
+  { id:'PV-007', empresa:'Farmacia Central',       contacto:'María López',   empleado:'Cristian G.', estado:'FACTURADO',           fecha:'2026-03-02', actualizacion:'2026-03-28', desc:'Equipo split 12000 BTU' },
+  { id:'PV-008', empresa:'Panadería El Trigo',     contacto:'Pablo Castro',  empleado:'Nicolás G.',  estado:'PERDIDA',             fecha:'2026-03-20', actualizacion:'2026-03-25', desc:'Cliente optó por otro proveedor' },
+  { id:'PV-009', empresa:'Club Neptuno',           contacto:'Rosa Ferreira', empleado:'Cristian G.', estado:'CONTACTO_PROVEEDOR',  fecha:'2026-03-25', actualizacion:'2026-04-04', desc:'Unidades condensadoras múltiples' },
+  { id:'PV-010', empresa:'Supermercado El Dorado', contacto:'Marcelo Ríos',  empleado:'Nicolás G.',  estado:'EN_INSTALACION',      fecha:'2026-03-18', actualizacion:'2026-04-07', desc:'Segundo pedido — cámara adicional' },
+  { id:'PV-011', empresa:'Distribuidora Sur',      contacto:'Tomás Acosta',  empleado:'Cristian G.', estado:'CERRADO',             fecha:'2026-02-05', actualizacion:'2026-03-10', desc:'Accesorios varios — cerrado con éxito' },
+  { id:'PV-012', empresa:'—',                      contacto:'Valeria Soto',  empleado:'Nicolás G.',  estado:'NUEVO_CONTACTO',      fecha:'2026-04-08', actualizacion:'2026-04-08', desc:'Solicitud vía catálogo web' },
+  { id:'PV-013', empresa:'Hospital Británico',     contacto:'Diego Ramos',   empleado:'Cristian G.', estado:'COTIZANDO',           fecha:'2026-04-06', actualizacion:'2026-04-10', desc:'Sistema de refrigeración médica' },
+  { id:'PV-014', empresa:'Hotel Intercontinental', contacto:'Laura Méndez',  empleado:'Nicolás G.',  estado:'VENTA_CONFIRMADA',    fecha:'2026-03-31', actualizacion:'2026-04-09', desc:'Split 24000 BTU × 3 unidades' },
+];
+
+const PAGE_SIZE = 10;
+let currentPage = 1;
+let filtered = [...PROCESOS];
+let sortCol = 'actualizacion';
+let sortDir = 'desc';
+
+function fmtDate(iso) {
+  if (!iso || iso === '—') return '—';
+  const [y,m,d] = iso.split('-');
+  return d+'/'+m+'/'+y;
+}
+
+function applyFilter() {
+  const est = document.getElementById('filterEstado').value;
+  filtered = est ? PROCESOS.filter(p => p.estado === est) : [...PROCESOS];
+  currentPage = 1;
+  applySort();
+  render();
+}
+
+function toggleSort(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = 'desc';
+  }
+  currentPage = 1;
+  applySort();
+  render();
+}
+
+function applySort() {
+  filtered.sort((a, b) => {
+    const va = a[sortCol] || '';
+    const vb = b[sortCol] || '';
+    return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+  updateSortIcons();
+}
+
+function updateSortIcons() {
+  ['fecha','actualizacion'].forEach(col => {
+    const icon = document.getElementById('si-'+col);
+    const th   = document.getElementById('th-'+col);
+    if (!icon) return;
+    if (sortCol === col) {
+      icon.textContent = sortDir === 'asc' ? '↑' : '↓';
+      th.style.color = 'var(--teal)';
+    } else {
+      icon.textContent = '↕';
+      th.style.color = '';
+    }
+  });
+}
+
+function render() {
+  renderStats();
+  renderTable();
+  renderPagination();
+}
+
+function renderStats() {
+  const all = PROCESOS;
+  document.getElementById('statActivos').textContent   = all.filter(p => p.estado !== 'CERRADO' && p.estado !== 'PERDIDA').length;
+  document.getElementById('statNuevos').textContent    = all.filter(p => p.estado === 'NUEVO_CONTACTO').length;
+  document.getElementById('statCotizando').textContent = all.filter(p => p.estado === 'COTIZANDO' || p.estado === 'COTIZACION_ENVIADA').length;
+  document.getElementById('statPerdidos').textContent  = all.filter(p => p.estado === 'PERDIDA').length;
+  document.getElementById('countLabel').textContent = filtered.length;
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  const page = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+  if (page.length === 0) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <p>No hay procesos que coincidan con el filtro seleccionado.</p>
+    </td></tr>`;
+    document.getElementById('pageInfo').textContent = 'Sin resultados';
+    return;
+  }
+
+  const s = (currentPage-1)*PAGE_SIZE + 1;
+  const e = Math.min(currentPage*PAGE_SIZE, filtered.length);
+  document.getElementById('pageInfo').textContent = `Mostrando ${s}–${e} de ${filtered.length}`;
+
+  page.forEach(p => {
+    const est = ESTADOS[p.estado] || { label: p.estado, cls: 's-cerrado' };
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="td-id">${esc(p.id)}</span></td>
+      <td><div class="td-main">${esc(p.empresa)}</div></td>
+      <td class="col-contacto"><div style="color:var(--gray-700)">${esc(p.contacto)}</div></td>
+      <td><span class="badge ${est.cls}"><span class="badge-dot"></span>${est.label}</span></td>
+      <td class="col-empleado" style="color:var(--gray-500)">${esc(p.empleado)}</td>
+      <td style="color:var(--gray-500)">${fmtDate(p.fecha)}</td>
+      <td style="color:var(--gray-500)">${fmtDate(p.actualizacion)}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-icon" title="Ver detalle">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderPagination() {
+  const pag = document.getElementById('pagination');
+  pag.innerHTML = '';
+  const pages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (pages <= 1) return;
+
+  const prev = mkBtn('‹', currentPage === 1);
+  prev.onclick = () => { currentPage--; render(); };
+  pag.appendChild(prev);
+
+  for (let i = 1; i <= pages; i++) {
+    const b = mkBtn(String(i), false);
+    if (i === currentPage) b.classList.add('active');
+    b.onclick = () => { currentPage = i; render(); };
+    pag.appendChild(b);
+  }
+
+  const next = mkBtn('›', currentPage === pages);
+  next.onclick = () => { currentPage++; render(); };
+  pag.appendChild(next);
+}
+
+function mkBtn(t, dis) {
+  const b = document.createElement('button');
+  b.className = 'page-btn'; b.textContent = t; b.disabled = dis;
+  return b;
+}
+
+function openNewModal() {
+  alert('Aquí se abriría el formulario de registro de nuevo proceso de venta (RF23).');
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+applySort();
+render();
+</script>
+</body>
+</html>
