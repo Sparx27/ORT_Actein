@@ -20,7 +20,14 @@ export const postProduct = async (body) => {
   return data
 }
 
-export const deactivateProduct = async (id) => {
-  const { data } = await privateService.patch(`/products/${id}/status`)
+export const editProduct = async (id, body) => {
+  console.log('body:')
+  console.log(body)
+  const { data } = await privateService.put(`/products/${id}`, body)
+  return data
+}
+
+export const toggleProduct = async ({ id, is_active }) => {
+  const { data } = await privateService.patch(`/products/${id}/status`, { is_active })
   return data
 }

@@ -15,12 +15,12 @@ function req_msg(name, ao) {
 }
 
 export const UI_CONFIG = {
-  btnHeaderList: (setCreateModalOpen) => {
+  btnHeaderList: (handleOpenModal) => {
     return [
       {
         label: 'Nuevo Producto',
         icon: <SvgAdd />,
-        onClick: () => setCreateModalOpen(true),
+        onClick: () => handleOpenModal(true),
         variant: 'primary'
       }
     ]
@@ -34,29 +34,21 @@ export const UI_CONFIG = {
     },
     { header: 'categoría', key: 'category_name' },
     {
-      header: 'activo',
+      header: 'estado',
       key: 'is_active',
       render: (v) => <StatusBadge active={v} />
     }
   ],
-  tableActions: (setEditingProduct, setEditModalOpen, setDeletingProduct, setDeleteModalOpen, PRODUCTS) => {
+  tableActions: (onClickEditBtn, onClickToggleBtn) => {
     return [
       {
         icon: () => <SvgEdit />,
-        onClick: (row) => {
-          const product = PRODUCTS.find(c => String(c.id) === String(row[0]))
-          setEditingProduct(product)
-          setEditModalOpen(true)
-        }
+        onClick: (product) => onClickEditBtn(product ? product[0] : undefined)
       },
       {
-        icon: (isActive) => isActive ? <SvgDeactivate /> : <SvgActivate />,
-        onClick: (row) => {
-          const product = PRODUCTS.find(c => String(c.id) === String(row[0]))
-          setDeletingProduct(product)
-          setDeleteModalOpen(true)
-        },
-        danger: true
+        icon: () => <SvgActivate />,
+        onClick: (product) => onClickToggleBtn(product),
+        danger: false
       }
     ]
   },
@@ -153,14 +145,84 @@ export const UI_CONFIG = {
       {
         type: 'select',
         name: API_IS_ACTIVE,
-        placeholder: 'Producto activo',
+        placeholder: 'Estado',
         defaultOpt: 'Ambos',
         options: [
-          { value: 'true', label: 'Si' },
-          { value: 'false', label: 'No' }
+          { value: 'true', label: 'Activo' },
+          { value: 'false', label: 'Inactivo' }
         ],
         control: control
       }
+    ]
+  },
+  formEditControls: (categories) => {
+    return [
+      {
+        controlType: 'input',
+        type: 'text',
+        name: 'e_sku',
+        label: 'SKU',
+        validations: {
+          maxLength: { value: 255, message: 'Máximo 255 caracteres' }
+        }
+      },
+      {
+        controlType: 'input',
+        type: 'text',
+        name: 'e_name',
+        label: 'Nombre *',
+        validations: {
+          required: req_msg('Nombre', 'o'),
+          maxLength: { value: 255, message: 'Máximo 255 caracteres' }
+        }
+      },
+      {
+        controlType: 'textarea',
+        name: 'e_description',
+        label: 'Descripción'
+      },
+      {
+        controlType: 'combobox',
+        name: 'e_category_id',
+        label: 'Categoría *',
+        options: categories,
+        placeholder: 'Seleccionar',
+        validations: {
+          required: req_msg('Categoría', 'a')
+        }
+      },
+      {
+        controlType: 'input',
+        type: 'text',
+        name: 'e_brand',
+        label: 'Marca *',
+        validations: {
+          required: req_msg('Marca', 'a'),
+          maxLength: { value: 255, message: 'Máximo 255 caracteres' }
+        }
+      },
+      {
+        controlType: 'textarea',
+        name: 'e_specifications',
+        label: 'Especificaciones'
+      },
+      {
+        controlType: 'input',
+        type: 'number',
+        name: 'e_maintenance_time',
+        label: 'Tiempo para mantenimiento (días)',
+        validations: {
+          validate: {
+            isInteger: (v) => !v || Number.isInteger(Number(v)) || 'Debe ser un número entero',
+            isPositive: (v) => !v || Number(v) >= 0 || 'Debe ser cero o positivo'
+          }
+        }
+      },
+      {
+        controlType: 'checkbox',
+        name: 'e_requires_installation',
+        label: 'Requiere instalación'
+      },
     ]
   }
 }
