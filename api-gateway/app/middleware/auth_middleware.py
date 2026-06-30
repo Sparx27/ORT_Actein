@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
-from app.auth.auth_handler import verify_token
+from app.middleware.auth_handler import verify_token
 
 INCLUDE_PATHS = ['/private/']
 
