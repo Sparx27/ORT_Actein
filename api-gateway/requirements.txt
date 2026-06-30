@@ -5,3 +5,4 @@ python-dotenv==1.1.0
 pydantic-settings==2.14.1
 python-jose[cryptography]==3.5.0
 ruff==0.15.17
+slowapi==0.1.10
