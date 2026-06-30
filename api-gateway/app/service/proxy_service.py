@@ -4,6 +4,12 @@ from fastapi.responses import JSONResponse, Response
 
 from app.repository.backend_repository import forward_request
 
+EXCLUDED_REQUEST_HEADERS = {'host', 'content-length', 'transfer-encoding', 'connection'}
+
+
+def _filter_request_headers(headers: dict) -> dict:
+    return {key: value for key, value in headers.items() if key.lower() not in EXCLUDED_REQUEST_HEADERS}
+
 
 async def proxy_request(request: Request, target_url: str, path: str) -> Response:
     url = f'{target_url}/{path}'
@@ -12,7 +18,7 @@ async def proxy_request(request: Request, target_url: str, path: str) -> Respons
             method=request.method,
             url=url,
             params=request.query_params,
-            headers=dict(request.headers),
+            headers=_filter_request_headers(dict(request.headers)),
             content=await request.body(),
         )
     except httpx.TimeoutException:
